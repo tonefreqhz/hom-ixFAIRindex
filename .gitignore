@@ -1,0 +1,25 @@
+﻿# ---- Python ----
+__pycache__/
+*.py[cod]
+*.log
+
+# ---- Virtual env ----
+.venv/
+
+# ---- Generated artifacts / runs ----
+build/
+outputs/
+publication/
+archive/
+_reports/
+_audit_*/
+
+# ---- OS / editor ----
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+
+# ---- Secrets ----
+.env
+.env.*

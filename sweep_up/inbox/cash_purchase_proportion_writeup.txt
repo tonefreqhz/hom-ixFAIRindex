@@ -1,0 +1,34 @@
+Cash purchases as a proportion of total transactions — interpretation
+========================================================================
+
+What this metric is:
+- Cash share (%) = cash purchases / (cash purchases + mortgage purchases), quarterly.
+  Higher values mean a larger fraction of sales are not using a mortgage.
+
+Latest snapshot (from your files):
+- England latest (2025-12-31): 26.87% (1y change -0.66 pp, 5y change -1.80 pp)
+  5y avg: 29.50%, 10y avg: 29.28%
+  Peak: 37.25% (2016-03-31), Trough: 25.66% (2019-06-30)
+- Wales latest (2025-12-31): 30.25% (1y change +1.07 pp, 5y change -4.78 pp)
+  5y avg: 32.06%, 10y avg: 32.75%
+  Peak: 43.46% (2016-03-31), Trough: 28.76% (2025-06-30)
+
+What changes in cash share usually suggest:
+- If cash share rises (up):
+  - Mortgages may be harder/less attractive (higher rates, tighter lending, affordability squeeze).
+  - Cash-rich buyers can dominate: downsizers, investors, corporate/portfolio buyers, or overseas buyers.
+  - In downturns, mortgage-dependent demand often falls faster than cash demand, pushing the share up.
+- If cash share falls (down):
+  - Mortgage credit is more available/cheaper (lower rates, looser lending, improved sentiment).
+  - First-time buyer and mortgaged mover activity is stronger relative to cash buyers.
+
+What your most recent movement implies (based on 1-year change):
+- England: cash share is falling over 1y (-0.66 pp).
+  That leans toward improving mortgage accessibility/costs, or a rebound in mortgaged buyers.
+- Wales: cash share is rising over 1y (+1.07 pp).
+  Often seen when mortgage demand is softer than cash demand, or cash-rich segments are more active.
+
+Caveats (worth keeping you honest):
+- This is a *share*: it can rise even if cash purchases are flat, as long as mortgage purchases fall.
+- Cash vs mortgage is only one slice; it doesn’t tell you whether buyers are investors vs owner-occupiers.
+- If totals differ from new+existing counts, treat mix comparisons cautiously (the dataset can have quirks).
