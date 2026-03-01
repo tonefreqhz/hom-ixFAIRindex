@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home@ix — Full Working Book (print bundle)</title>
+
+  <!-- MathJax (standardised to $$..$$) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        displayMath: [['$$','$$']],
+        inlineMath: []
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <style>
+    :root { --max: 980px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; line-height: 1.6; margin: 2rem; color: #111; }
+    main { max-width: var(--max); margin: 0 auto; }
+    h1, h2, h3 { line-height: 1.15; }
+    .meta { color: #444; }
+    .box { border: 1px solid #ddd; padding: 12px 14px; border-radius: 10px; background: #fafafa; margin: 1.2rem 0; }
+    figure { margin: 1.25rem 0; padding: .75rem; border: 1px dashed #cfcfcf; border-radius: 10px; }
+    figcaption { color: #444; font-size: .95rem; }
+    hr { border: 0; border-top: 1px solid #eee; margin: 2rem 0; }
+
+    figure { max-width: 900px; margin-left: auto; margin-right: auto; }
+    figure img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Home@ix — Full Working Book (Draft)</h1>
+      <p class="meta"><strong>Print bundle:</strong> print_20260301_094520 &nbsp;|&nbsp; <strong>Built:</strong> 2026-03-01 09:45</p>
+    </header>
+
+    <section class="box">
+  <h2>Known issues (pre-publication)</h2>
+  <ul>
+    <li><strong>Animation rendering:</strong> some animated assets may not display in all viewers. Use exported GIF/PNG fallbacks in <code>assets/</code> where provided.</li>
+    <li><strong>Math rendering:</strong> equations are standardised to <code>$$...$$</code>. If any equations appear unrendered, open the HTML in a modern browser (MathJax-enabled).</li>
+  </ul>
+</section>
+
+    <hr />
+
+    <section id="part1">
+  <h2>Part I — The 2024 Foundations: Market Function Before Price</h2>
+
+  <p>
+    Home@ix began from an observation that sounds simple but changes the whole measurement problem:
+    in UK housing stress regimes, the market does not reliably clear through orderly repricing.
+    It often clears through <strong>rationing participation</strong>. Turnover collapses, transaction chains fail,
+    mortgage-dependent households are screened out, and the observed price index becomes a <em>selected statistic</em> produced by a thinner, wealthier transacting set.
+  </p>
+
+  <p>
+    Part I sets the domain terms for the rest of the book. Before we define FAIR (the derived, reproducible regime indicator),
+    we anchor the foundational claim with a canonical diagnostic module: turnover (market liquidity), cash-versus-mortgage dynamics (access to finance),
+    and the balance between new build and old stock activity (delivery and churn capacity).
+  </p>
+
+  <div class="box">
+    <strong>Working proposition:</strong> affordability is not only a burden ratio; it is an <strong>access-and-allocation regime outcome</strong>.
+    In thin markets, price signals can lag while exclusion and mobility failure worsen in real time.
+  </div>
+
+  <hr />
+
+  <section id="part1-exhibits">
+    <h3>1. A canonical diagnostic module (market depth, access, and mix)</h3>
+    <p>
+      The exhibits below are treated as a single system lens. Read together, they diagnose whether the housing system is clearing via price,
+      or via <em>quantity and composition</em> (thin-market clearing).
+    </p>
+
+    <hr />
+
+    <section id="part1-fig1">
+      <h3>Figure 1 — Turnover and cash share (annual)</h3>
+      <p>
+        Turnover is the housing market’s <strong>functionality / liquidity</strong> indicator: how many homes change hands relative to the stock.
+        Cash share is a <strong>participation / exclusion</strong> indicator: when cash share rises alongside weak turnover, it is consistent with
+        mortgage-dependent households being rationed out by rates, underwriting, or deposit constraints.
+      </p>
+      <figure>
+        <img src="figures/exhibit_1_turnover_cashshare_annual.png"
+             alt="Exhibit 1 — Stock turnover (%) and cash share (annual)" loading="lazy" />
+        <figcaption><strong>Figure 1.</strong> Stock turnover and cash share (annual).</figcaption>
+      </figure>
+    </section>
+
+    <hr />
+
+    <section id="part1-fig2a">
+      <h3>Figure 2a — Transaction levels: old stock vs new build (annual)</h3>
+      <p>
+        “Housing activity” is not one market. Old stock dominates volume and is more <strong>credit- and chain-sensitive</strong>.
+        New build volumes reflect additional constraints (planning, labour, build finance, developer pacing). The split helps distinguish
+        <em>access/finance stress</em> from <em>delivery/capacity stress</em>.
+      </p>
+      <figure>
+        <img src="figures/exhibit_2a_transaction_levels_annual.png"
+             alt="Exhibit 2a — Transaction levels: old stock vs new build (annual)" loading="lazy" />
+        <figcaption><strong>Figure 2a.</strong> Transaction levels: old stock vs new build (annual).</figcaption>
+      </figure>
+    </section>
+
+    <hr />
+
+    <section id="part1-fig2b">
+      <h3>Figure 2b — Transaction mix shares (annual)</h3>
+      <p>
+        Mix shares reveal <strong>compositional clearing</strong>: who is still able to transact when the market thins.
+        Shifts in shares can signal allocation stress even when headline prices appear stable.
+      </p>
+      <figure>
+        <img src="figures/exhibit_2b_transaction_mix_shares_annual.png"
+             alt="Exhibit 2b — Transaction mix shares (annual)" loading="lazy" />
+        <figcaption><strong>Figure 2b.</strong> Transaction mix shares (annual).</figcaption>
+      </figure>
+    </section>
+
+    <hr />
+
+    <section id="part1-fig4">
+      <h3>Figure 4 — Indexed price vs indexed turnover (annual)</h3>
+      <p>
+        When turnover collapses, price indices can lag or understate stress because fewer transactions generate weaker price discovery.
+        Liquidity risk becomes macro-relevant.
+      </p>
+      <figure>
+        <img src="figures/exhibit_4_price_vs_turnover_index_annual.png"
+             alt="Exhibit 4 — House price vs turnover (indexed, annual)" loading="lazy" />
+        <figcaption><strong>Figure 4.</strong> Indexed price vs indexed turnover (annual).</figcaption>
+      </figure>
+    </section>
+
+    <hr />
+
+    <section id="part1-cashshare-ew">
+      <h3>Supplement — Cash purchases share (England vs Wales, quarterly)</h3>
+      <p>
+        A cross-nation comparison helps separate broad regime shifts from local noise.
+        Divergences can reflect geography-specific credit conditions, investor mix, or compositional effects.
+      </p>
+      <figure>
+        <img src="figures/england_wales_cash_share_quarterly.png"
+             alt="Cash purchases as a proportion of total transactions (quarterly): England vs Wales"
+             loading="lazy" />
+        <figcaption><strong>Supplement.</strong> Cash purchases as a proportion of total transactions (quarterly): England vs Wales.</figcaption>
+      </figure>
+    </section>
+  </section>
+
+  <hr />
+
+  <section id="part1-bridge-to-identity">
+    <h3>2. Why this forces an accounting identity (and later, FAIR)</h3>
+    <p>
+      If the system clears through <strong>quantities and composition</strong> under stress, then an affordability framework must track access-to-finance
+      and market depth/throughput — not just price levels.
+    </p>
+    <div class="box">
+      <strong>Bridge statement:</strong> Part I defines the failure mode (thin-market clearing). FAIR later converts that diagnosis into a reproducible quarterly monitor.
+    </div>
+  </section>
+
+  <hr />
+
+  <section id="part1-source-note">
+    <h3>3. Source note (reproducibility)</h3>
+    <ul>
+      <li><strong>Exhibits generator:</strong> <code>sweep_up/inbox/homeatix_annual_exhibits.py</code></li>
+      <li><strong>Bundled figures:</strong> <code>figures/</code> (relative to this <code>index.html</code>)</li>
+    </ul>
+  </section>
+</section>
+
+    <hr />
+
+    <section id="followup">
+      <h2>Follow-up Paper</h2>
+      <header>
+    <h1><strong>Home@ix Follow-up:</strong> Mortgage-Credit Concentration, M4 Dependency, and UK Housing Affordability Regimes — With a Reproducible Early-Warning Indicator (FAIR)</h1>
+    <p class="meta"><strong>Author:</strong> Home@ix (Working Paper / Draft)</p>
+    <p class="meta"><strong>Date:</strong> 25 February 2026</p>
+  </header>
+
+  <section class="abstract" aria-label="Abstract">
+    <h2 style="border-top:none;padding-top:0;margin-top:0;">Abstract</h2>
+    <p>
+      The UK housing affordability crisis is commonly presented as a price-to-income problem. That framing is incomplete in regimes where
+      housing markets do not clear through price adjustment. Under stress, clearing occurs through quantities and composition: turnover falls,
+      chains fail, mortgage-dependent households are rationed out, and the observed price level becomes a lagging and selected statistic.
+    </p>
+    <p>
+      This paper connects four reinforcing dimensions: (i) credit impairment risk in commercial banks under mortgage-credit concentration,
+      (ii) mortgage lending over-reliance and collateral feedback, (iii) structural dependency of broad money growth on mortgage credit creation,
+      and (iv) affordability deterioration as an access-and-allocation outcome. It then operationalises the diagnosis using <strong>Home@ix FAIR</strong>,
+      a transparent quarterly indicator designed as a <strong>2–3 year forward regime signal</strong> for affordability understood as throughput and access.
+      FAIR combines a credit–price decoupling wedge with a market-depth (turnover) term, optionally augmented by composition proxies.
+    </p>
+  </section>
+
+  <section>
+    <h2>Executive Summary</h2>
+    <p>
+      UK housing stress is not only about “high prices.” It is also about <strong>who can transact</strong> and <strong>how the market clears</strong>.
+      When mortgage credit tightens or uncertainty rises, the UK market often clears via <strong>reduced participation</strong> rather than orderly repricing:
+      transactions fall, turnover collapses, and cash-rich buyers gain share.
+    </p>
+
+    <div class="callout">
+      <strong>Core claim:</strong> mortgage-credit concentration in banks links financial stability and affordability.
+      When mortgage flows weaken, deposit creation weakens; when deposit growth weakens, the real economy tightens; when the economy tightens,
+      arrears risks rise; and when arrears risks rise, credit supply tightens further. Affordability deteriorates via allocation and throughput failure.
+    </div>
+
+    <h3>Key findings (sense-checked, definitions required in final)</h3>
+    <ul>
+      <li><strong>Mortgage concentration is systemic:</strong> residential mortgages comprise a large share of UK bank private-sector lending stock, increasing transmission from housing shocks to bank balance sheets.</li>
+      <li><strong>Broad money is mortgage-sensitive:</strong> when mortgage lending slows, broad money growth can undershoot nominal activity trends, reinforcing tight conditions.</li>
+      <li><strong>Near-term supply is throughput-constrained:</strong> major housebuilders pace sales within a narrow absorption band (sales per outlet per week), limiting market clearing via volume.</li>
+      <li><strong>Affordability is an allocation problem in stress:</strong> turnover collapses and buyer composition shifts (cash share rises), so the market “clears” by rationing access rather than by repricing alone.</li>
+      <li><strong>FAIR provides an operational monitor:</strong> FAIR detects credit–price decoupling and thinning market depth, giving a forward-looking regime signal consistent with the diagnosis.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>1. The Integrated Mechanism: Why These Four Dimensions Move Together</h2>
+    <p>
+      The four dimensions—bank credit quality, mortgage concentration, broad money dynamics, and affordability—are often analysed separately.
+      In practice, they form a coupled system with feedback loops.
+    </p>
+
+    <h3>1.1 System sketch (feedback loops)</h3>
+    <ul>
+      <li><strong>Mortgage concentration loop:</strong> house prices and employment shocks affect arrears and loss expectations, which tighten underwriting and reduce credit availability.</li>
+      <li><strong>Endogenous money loop:</strong> mortgage lending creates deposits; weakening mortgage flows reduce broad money growth, which can tighten spending conditions and worsen employment.</li>
+      <li><strong>Thin-market loop:</strong> tighter credit reduces the set of eligible buyers; turnover falls; observed prices become “stickier” and more selected; access worsens even if the price index moves slowly.</li>
+      <li><strong>Developer pacing loop:</strong> when demand weakens, builders protect margins by controlling release pace; volume cannot rise enough to clear via supply in the near term.</li>
+    </ul>
+
+    <p class="small">
+      This paper treats “affordability” as the regime outcome of these loops, not as a single ratio.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Credit Impairment: Surface Health vs Structural Fragility</h2>
+    <p>
+      Headline arrears and delinquency can look stable even as systemic vulnerability rises, because compositional selection improves the observed pool of borrowers
+      while stress accumulates in marginal cohorts (recent high-LTV buyers, BTL, renters-in-distress feeding landlord stress).
+    </p>
+
+    <h3>2.1 Why low arrears can be misleading</h3>
+    <ul>
+      <li><strong>Selection effects:</strong> improved observed arrears may partly reflect that the stressed tail stops transacting or is screened out of new lending.</li>
+      <li><strong>Threshold reporting:</strong> “serious arrears” definitions can miss earlier-stage stress that predicts later acceleration.</li>
+      <li><strong>BTL as leading indicator:</strong> landlord cashflows are more directly exposed to rate changes and tenant stress; BTL arrears can precede broader deterioration.</li>
+    </ul>
+
+    <h3>2.2 Debt servicing: risk rises continuously</h3>
+    <p>
+      If arrears probability increases roughly linearly beyond a low-stress floor, then stability depends on distribution shifts, not just tail events.
+      Small rightward shifts in the debt-servicing distribution can move a meaningful share of households into elevated stress.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Mortgage Lending Concentration and M4 Dependency</h2>
+    <p>
+      In an endogenous money system, bank lending and deposit creation are linked. If mortgage lending dominates bank balance sheets,
+      then housing-credit cycles imprint onto broad money dynamics and can propagate to the real economy.
+    </p>
+
+    <h3>3.1 What “M4 dependency” means operationally</h3>
+    <ul>
+      <li><strong>Mechanism:</strong> new mortgage lending creates deposits; weak mortgage origination can weaken deposit growth.</li>
+      <li><strong>Interpretation:</strong> slowing broad money growth is not mechanically “bad,” but it becomes a stress signal when it coincides with tight credit, weak turnover, and rising delinquency risk.</li>
+      <li><strong>Empirical caution:</strong> velocity and portfolio shifts matter; M4 is best used as a regime indicator alongside housing-credit and turnover measures.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. Housing Affordability as Market Clearing: Access, Allocation, Throughput</h2>
+    <p>
+      In stressed regimes, housing markets can fail to clear via prices and instead clear via participation constraints:
+      fewer mortgage-dependent buyers qualify, chains break more often, and turnover collapses.
+    </p>
+
+    <h3>4.1 Compositional clearing</h3>
+    <ul>
+      <li><strong>Turnover collapse:</strong> when transactions fall relative to stock, the market becomes thin; observed prices reflect a narrower set of buyers and properties.</li>
+      <li><strong>Buyer-type rationing:</strong> higher cash shares can coexist with sticky prices because cash demand clears the marginal flow even as mortgaged households are excluded.</li>
+      <li><strong>Distributional harm:</strong> renters and younger cohorts experience the binding constraint (access), even when average ratios look stable.</li>
+    </ul>
+
+    <h3>4.2 The absorption-rate constraint (near term)</h3>
+    <p>
+      New-build supply often cannot surge quickly enough to restore clearing through volume because developers pace sales (per outlet per week) to optimise margins and manage risk.
+      This creates a throughput constraint that is institutional/incentive-driven, not purely physical.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. From Diagnosis to Tooling: The Home@ix FAIR Indicator</h2>
+    <p>
+      The diagnosis implies two observable precursors to allocation stress that are available in aggregate data:
+      <strong>credit–price decoupling</strong> and <strong>thin-market clearing</strong>. FAIR is a reduced-form index that combines both.
+    </p>
+
+    <h3>5.1 Inputs (quarterly)</h3>
+    <ul>
+      <li>House prices (level): <code>avg_house_price_gbp</code></li>
+      <li>Mortgage stock (level, £m): <code>mb_total_gbp_m</code></li>
+      <li>Turnover (market depth): <code>turnover_pct_q</code></li>
+      <li>Optional: new-build share: <code>newbuild_share_of_transactions</code></li>
+      <li>Quarter index: <code>period</code>; geography: <code>geo</code> (e.g., EW)</li>
+    </ul>
+
+    <h3>5.2 Derived series</h3>
+    <p>Define year-on-year growth rates:</p>
+    <div class="eq">$$ g_t^P = YoY(P_t) $$</div>
+    <div class="eq">$$ g_t^{MB} = YoY(MB_t) $$</div>
+    <div class="eq">$$ g_t^{TO} = YoY(TO_t) $$</div>
+
+    <p>Define the credit–price wedge:</p>
+    <div class="eq">$$ W_t = g_t^P - g_t^{MB} $$</div>
+
+    <p>Optional new-build share change (YoY):</p>
+    <div class="eq">$$ \Delta NB_t = NB_t - NB_{t-4} $$</div>
+  </section>
+
+  <section>
+    <h2>6. Baseline Normalisation (Core Proviso)</h2>
+    <p>
+      To avoid defining “normal” using crisis regimes and structural breaks, z-scores are computed from pooled baseline windows:
+    </p>
+    <ul>
+      <li><strong>Baseline windows:</strong> 2003Q1–2007Q4 and 2013Q1–2019Q4</li>
+      <li><strong>Excluded:</strong> 2008–2012 (GFC and aftermath) and 2020+ (Covid and subsequent regime breaks)</li>
+    </ul>
+
+    <p>For any series $$X_t$$, define:</p>
+    <div class="eq">$$ z(X_t) = \frac{X_t - \mu_X}{\sigma_X} $$</div>
+    <p class="small">where $$\mu_X$$ and $$\sigma_X$$ are computed using baseline quarters only.</p>
+  </section>
+
+  <section>
+    <h2>7. FAIR Definition, Interpretation, and Monitoring</h2>
+    <p>
+      FAIR is scaled for interpretability and designed to be auditable. Weights are intentionally simple and can be stress-tested.
+    </p>
+
+    <h3>7.1 FAIR definition</h3>
+    <p>Default (three-component) specification:</p>
+    <div class="eq">
+      $$ FAIR_t = 100 \cdot \Big( 0.55 \cdot z(W_t) - 0.35 \cdot z(g_t^{TO}) + 0.10 \cdot z(\Delta NB_t) \Big) $$
+    </div>
+
+    <p>If the new-build term is not available:</p>
+    <div class="eq">
+      $$ FAIR_t = 100 \cdot \Big( 0.55 \cdot z(W_t) - 0.35 \cdot z(g_t^{TO}) \Big) $$
+    </div>
+
+    <h3>7.2 Direction-of-flow</h3>
+    <div class="eq">$$ \Delta FAIR_t = FAIR_t - FAIR_{t-1} $$</div>
+    <p class="small">
+      The level indicates regime pressure; the first difference indicates acceleration or easing.
+    </p>
+
+    <h3>7.3 Practical interpretation bands</h3>
+    <ul>
+      <li>$$FAIR \ge 50$$: strong deterioration regime risk</li>
+      <li>$$20 \le FAIR < 50$$: mild deterioration bias</li>
+      <li>$$-20 \le FAIR < 20$$: neutral/noisy</li>
+      <li>$$-50 \le FAIR < -20$$: mild improvement bias</li>
+      <li>$$FAIR < -50$$: strong improvement regime (often stress-driven)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>8. Evaluation: Event-Based Backtesting (Crash-Start Definitions)</h2>
+    <p>
+      FAIR can be evaluated as an early-warning tool using objective event definitions rather than narrative dating.
+    </p>
+
+    <h3>8.1 Crash-start events (rule-based)</h3>
+    <p>
+      A “crash start” may be defined as a local price peak followed by a drawdown of at least $$X\%$$ within $$Y$$ quarters,
+      with a minimum separation (cooldown) of $$C$$ quarters to avoid double-counting clustered peaks.
+    </p>
+
+    <h3>8.2 Illustrative warning rules</h3>
+    <ul>
+      <li>A: sustained level stress: $$FAIR > 20$$ for 2 quarters</li>
+      <li>B: sustained acceleration: $$\Delta FAIR > 5$$ for 2 quarters</li>
+      <li>C: broad stress-worsening: $$FAIR > 0$$ and $$\Delta FAIR \ge 0$$</li>
+    </ul>
+
+    <h3>8.3 Metrics</h3>
+    <ul>
+      <li>Lead time (quarters) from the most recent signal to each crash start</li>
+      <li>False-positive proxy: share of signal quarters not followed by any crash start within a forward window (e.g., 8 quarters)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>9. Outputs and Visualisations (Reproducible)</h2>
+    <p>
+      This draft renders the latest FAIR assets directly from the Home@ix output folders.
+      All paths below are <strong>relative to the server root</strong> (the folder you run <code>py -m http.server</code> in).
+    </p>
+
+    <h3>9.1 FAIR headline level</h3>
+
+    <figure>
+      <img src="outputs/figures/fig_fair_level.png"
+           alt="Home@ix FAIR: Level (outputs/figures)" />
+      <figcaption>
+        <strong>Figure 1.</strong> Home@ix FAIR (level). Source: <code>outputs/figures/fig_fair_level.png</code>
+      </figcaption>
+    </figure>
+
+    <figure>
+      <img src="outputs/fair_assets/fig_fair_level.png"
+           alt="Home@ix FAIR: Level (outputs/fair_assets)" />
+      <figcaption>
+        <strong>Figure 1b.</strong> Home@ix FAIR (level). Source: <code>outputs/fair_assets/fig_fair_level.png</code>
+      </figcaption>
+    </figure>
+
+    <hr />
+
+    <h3>9.2 Component contributions</h3>
+
+    <figure>
+      <img src="outputs/figures/fig_fair_contrib.png"
+           alt="Home@ix FAIR: Contributions (outputs/figures)" />
+      <figcaption>
+        <strong>Figure 2.</strong> FAIR component contributions. Source: <code>outputs/figures/fig_fair_contrib.png</code>
+      </figcaption>
+    </figure>
+
+    <figure>
+      <img src="outputs/fair_assets/fig_fair_contributions.png"
+           alt="Home@ix FAIR: Contributions (outputs/fair_assets)" />
+      <figcaption>
+        <strong>Figure 2b.</strong> FAIR component contributions. Source: <code>outputs/fair_assets/fig_fair_contributions.png</code>
+      </figcaption>
+    </figure>
+
+    <hr />
+
+    <h3>9.3 Direction-of-flow (animated GIFs)</h3>
+
+    <figure>
+      <img src="outputs/figures/anim_fair_flow.gif"
+           alt="FAIR direction-of-flow animation (outputs/figures)" />
+      <figcaption>
+        <strong>Figure 3.</strong> Direction-of-flow animation. Source: <code>outputs/figures/anim_fair_flow.gif</code>
+      </figcaption>
+    </figure>
+
+    <figure>
+      <img src="outputs/fair_assets/anim_fair_direction_of_flow.gif"
+           alt="FAIR direction-of-flow animation (outputs/fair_assets)" />
+      <figcaption>
+        <strong>Figure 3b.</strong> Direction-of-flow animation. Source: <code>outputs/fair_assets/anim_fair_direction_of_flow.gif</code>
+      </figcaption>
+    </figure>
+
+    <hr />
+
+    <h3>9.4 Backtest / evaluation figures</h3>
+
+    <figure>
+      <img src="outputs/draft_paper_assets/fig_price_and_fair_with_crash_starts.png"
+           alt="Price and FAIR with crash starts" />
+      <figcaption>
+        <strong>Figure 4.</strong> Prices and FAIR with crash-start annotations. Source:
+        <code>outputs/draft_paper_assets/fig_price_and_fair_with_crash_starts.png</code>
+      </figcaption>
+    </figure>
+
+    <figure>
+      <img src="outputs/draft_paper_assets/fig_avg_leadtime_by_signal.png"
+           alt="Average lead time by signal rule" />
+      <figcaption>
+        <strong>Figure 5.</strong> Average lead time by signal rule. Source:
+        <code>outputs/draft_paper_assets/fig_avg_leadtime_by_signal.png</code>
+      </figcaption>
+    </figure>
+
+    <p class="small">
+      If any image fails to load, your Python server console will log a 404 showing the exact path requested.
+    </p>
+  </section>
+
+  <section>
+    <h2>10. Policy and Structural Reform (Implications of the Regime View)</h2>
+    <p>
+      Standard levers (rate cuts, planning reform, time-limited subsidies) can influence symptoms without breaking the feedback loops.
+      If affordability deterioration is driven by allocation and throughput failure under mortgage-credit dominance, then structural reform must
+      address credit channel design and tenure/ownership pathways.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Problem loop</strong></th>
+          <th><strong>Symptom-focused lever</strong></th>
+          <th><strong>Structural lever (examples)</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mortgage-credit dominance ties stability to housing</td>
+          <td>Macroprudential tweaks, temporary guarantees</td>
+          <td>Ring-fenced affordable housing credit; alternative tenure finance</td>
+        </tr>
+        <tr>
+          <td>Thin-market clearing excludes mortgaged households</td>
+          <td>Stamp duty holidays, small buyer grants</td>
+          <td>Shared equity/co-op models; community land trusts</td>
+        </tr>
+        <tr>
+          <td>Developer pacing constrains near-term throughput</td>
+          <td>Planning speed, incentives to build</td>
+          <td>Counter-cyclical delivery vehicles; public options for build-to-live</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>11. Limitations and Extensions</h2>
+    <p>
+      FAIR is intentionally reduced-form. It captures two dominant mechanisms but does not directly encode:
+      arrears microdata, cash-buyer share, investor/renter distress transmission, or explicit developer pacing series.
+      These are natural extensions that can be layered as satellite indicators.
+    </p>
+  </section>
+
+  <section>
+    <h2>12. Conclusion</h2>
+    <p>
+      UK housing affordability is not only a price level story; it is a regime story about who can transact and how the market clears when credit tightens.
+      Mortgage-credit concentration links affordability outcomes to financial stability dynamics, and broad money conditions can amplify stress.
+      Home@ix FAIR translates this diagnosis into an operational, reproducible monitor of regime risk by combining credit–price decoupling with market depth.
+    </p>
+  </section>
+
+  <section>
+    <h2>Reproducibility Note</h2>
+    <p>Expected output directory contents (adjust to your workflow):</p>
+    <ul>
+      <li><code>outputs/fair_assets/fair_quarterly_audit.csv</code></li>
+      <li><code>outputs/figures/fig_fair_level.png</code></li>
+      <li><code>outputs/figures/fig_fair_contrib.png</code></li>
+      <li><code>outputs/figures/anim_fair_flow.gif</code></li>
+      <li><code>outputs/fair_assets/fig_fair_level.png</code></li>
+      <li><code>outputs/fair_assets/fig_fair_contributions.png</code></li>
+      <li><code>outputs/fair_assets/anim_fair_direction_of_flow.gif</code></li>
+      <li><code>outputs/draft_paper_assets/fig_price_and_fair_with_crash_starts.png</code></li>
+      <li><code>outputs/draft_paper_assets/fig_avg_leadtime_by_signal.png</code></li>
+    </ul>
+  </section>
+    </section>
+
+    <hr />
+
+    <section id="fair">
+      <h2>FAIR Paper</h2>
+      <header>
+    <h1><strong>Home@ix FAIR:</strong> A Forward Indicator of UK Housing Affordability Regimes Using Credit–Price Decoupling and Market Depth</h1>
+    <p class="meta"><strong>Author:</strong> Home@ix (Working Paper / Draft)</p>
+    <p class="meta"><strong>Date:</strong> 25 February 2026</p>
+  </header>
+
+  <section class="abstract" aria-label="Abstract">
+    <h2 style="border-top:none;padding-top:0;margin-top:0;">Abstract</h2>
+    <p>
+      UK housing affordability is usually discussed as a price level or a price-to-income ratio. That framing is necessary but incomplete because UK housing markets often do not clear primarily through price adjustment. In stressed regimes, markets clear through quantities and composition: turnover collapses, chains fail, mortgage-dependent households are rationed out, and observed prices can appear sticky or misleading. This paper introduces Home@ix FAIR: a quarterly indicator designed as a 2–3 year forward regime signal for affordability understood as access and allocation, not only price burden. FAIR is intentionally reduced-form and reproducible. It integrates a credit–price wedge (prices outrunning mortgage-stock growth), a market-depth term (turnover dynamics) capturing thin-market clearing, and an optional composition term (new-build share dynamics). To avoid defining “normal” using crisis regimes and structural breaks, FAIR is normalised to pooled baseline windows excluding the Global Financial Crisis aftermath and Covid-era disruptions. FAIR is paired with a direction-of-flow statistic and can be evaluated via event-based backtesting (drawdown-defined crash starts). Together, the index and backtests form an operational toolkit for monitoring affordability regime risk.
+    </p>
+  </section>
+
+  <section>
+    <h2>Executive Summary</h2>
+    <p>
+      UK housing affordability is typically treated as a static burden ratio. Yet housing is not a frictionless market. When credit tightens or uncertainty rises, the UK housing market frequently clears via reduced participation rather than orderly repricing: transactions fall, turnover collapses, and access deteriorates even when price ratios appear stable.
+    </p>
+
+    <p>
+      This paper introduces <strong>Home@ix FAIR</strong>, a reproducible quarterly indicator designed to act as a <strong>2–3 year forward regime signal</strong> for affordability understood as <strong>access and allocation</strong>. FAIR integrates:
+    </p>
+    <ul>
+      <li>a <strong>credit–price wedge</strong> capturing decoupling between house-price growth and mortgage-stock growth;</li>
+      <li>a <strong>market-depth / turnover term</strong> capturing thin-market (quantity-clearing) stress; and</li>
+      <li>an <strong>optional composition term</strong> based on new-build share dynamics.</li>
+    </ul>
+
+    <p>
+      To avoid contaminating baseline moments with crisis regimes and structural breaks, FAIR is normalised using pooled baseline windows:
+    </p>
+    <ul>
+      <li><strong>Baseline windows:</strong> 2003Q1–2007Q4 and 2013Q1–2019Q4</li>
+      <li><strong>Excluded:</strong> 2008–2012 (GFC and aftermath) and 2020+ (Covid and subsequent regime breaks)</li>
+    </ul>
+
+    <p>
+      FAIR is accompanied by a direction-of-flow measure and can be assessed as an early-warning tool using objective event definitions (e.g., crash starts defined by drawdowns from local peaks).
+    </p>
+  </section>
+
+  <section>
+    <h2>Introduction: Affordability as Access, Allocation, and Market Clearing</h2>
+    <p>
+      Standard affordability measures (e.g., price-to-income ratios) treat affordability as a price-only object. But UK housing often fails to clear under stress through price adjustment. Instead, the system shifts toward thin-market clearing:
+    </p>
+    <ul>
+      <li>transactions decline sharply;</li>
+      <li>the transacting population becomes more selected (composition shifts);</li>
+      <li>access deteriorates even if headline price ratios appear stable.</li>
+    </ul>
+
+    <p>
+      This paper therefore treats affordability as a <strong>regime outcome</strong> shaped by credit creation, market depth, and institutional constraints, and introduces an indicator designed to detect when the system is moving into a regime where affordability is likely to deteriorate over the next 2–3 years.
+    </p>
+  </section>
+
+  <section>
+    <h2>From Descriptive Diagnosis to a Forward-Looking Tool</h2>
+    <p>
+      Home@ix begins from an integrated diagnosis: mortgage-credit dominance in bank balance sheets, endogenous money creation via bank lending, and housing’s role as both a necessity and collateral asset. Moving from diagnosis to a forward-looking tool requires operationalising how stressed regimes appear in observable data.
+    </p>
+
+    <h3>Why “forward-looking” is operationally meaningful here</h3>
+    <p>A forward-looking affordability signal must capture two patterns that commonly precede later deterioration:</p>
+    <ul>
+      <li><strong>Credit–price decoupling:</strong> price growth outruns mortgage-stock growth.</li>
+      <li><strong>Thin-market clearing:</strong> market depth collapses (turnover declines), indicating rationing and throughput failure.</li>
+    </ul>
+
+    <p>
+      FAIR integrates these mechanisms into a single auditable index with an explicit baseline definition.
+    </p>
+  </section>
+
+  <section>
+    <h2>Data and Reproducible Construction</h2>
+    <p>FAIR is computed from quarterly series produced by the Home@ix feature set.</p>
+
+    <h3>Inputs (quarterly)</h3>
+    <p>Key variables:</p>
+    <ul>
+      <li>House prices (level): <code>avg_house_price_gbp</code></li>
+      <li>Mortgage stock (level, £m): <code>mb_total_gbp_m</code></li>
+      <li>Turnover (market depth): <code>turnover_pct_q</code> (transactions scaled by dwelling stock)</li>
+      <li>Optional composition proxy: <code>newbuild_share_of_transactions</code></li>
+      <li>Time index: <code>period</code> (quarter), and <code>geo</code> for region selection (e.g., EW)</li>
+    </ul>
+
+    <h3>Derived series</h3>
+    <p>Define year-on-year (YoY) growth rates:</p>
+
+    <div class="eq">$$ g_t^P = YoY(P_t) $$</div>
+    <div class="eq">$$ g_t^{MB} = YoY(MB_t) $$</div>
+    <div class="eq">$$ g_t^{TO} = YoY(TO_t) $$</div>
+
+    <p>Define the credit–price wedge:</p>
+    <div class="eq">$$ W_t = g_t^P - g_t^{MB} $$</div>
+
+    <p>Optional new-build share change (YoY):</p>
+    <div class="eq">$$ \Delta NB_t = NB_t - NB_{t-4} $$</div>
+  </section>
+
+  <section>
+    <h2>Baseline Normalisation (Core Proviso)</h2>
+    <p>
+      To avoid defining “normal” using crisis regimes and structural breaks, z-scores are computed from pooled baseline windows:
+    </p>
+    <ul>
+      <li>2003Q1–2007Q4</li>
+      <li>2013Q1–2019Q4</li>
+    </ul>
+
+    <p>Exclusions:</p>
+    <ul>
+      <li>2008–2012 (Global Financial Crisis and aftermath)</li>
+      <li>2020+ (Covid and subsequent regime breaks)</li>
+    </ul>
+
+    <p>For any series \(X_t\), define:</p>
+    <div class="eq">$$ z(X_t) = \frac{X_t - \mu_X}{\sigma_X} $$</div>
+
+    <p class="small">where $$\mu_X$$ and $$\sigma_X$$ are computed using baseline quarters only.</p>
+  </section>
+
+  <section>
+    <h2>The Home@ix FAIR Indicator</h2>
+
+    <h3>FAIR definition</h3>
+    <p>Default (three-component) specification:</p>
+    <div class="eq">
+      $$ FAIR_t = 100 \cdot \Big( 0.55 \cdot z(W_t) - 0.35 \cdot z(g_t^{TO}) + 0.10 \cdot z(\Delta NB_t) \Big) $$
+    </div>
+
+    <p>If the new-build term is not available, the final term is omitted:</p>
+    <div class="eq">
+      $$ FAIR_t = 100 \cdot \Big( 0.55 \cdot z(W_t) - 0.35 \cdot z(g_t^{TO}) \Big) $$
+    </div>
+
+    <h3>Direction-of-flow</h3>
+    <p>Define the direction-of-flow statistic:</p>
+    <div class="eq">$$ \Delta FAIR_t = FAIR_t - FAIR_{t-1} $$</div>
+
+    <p>This is used for monitoring whether affordability pressure is accelerating or easing.</p>
+
+    <h3>Interpretation bands (practical)</h3>
+    <p>A simple interpretive scheme:</p>
+    <ul>
+      <li>$$FAIR \ge 50$$: strong deterioration regime risk</li>
+      <li>$$20 \le FAIR < 50$$: mild deterioration bias</li>
+      <li>$$-20 \le FAIR < 20$$: neutral/noisy</li>
+      <li>$$-50 \le FAIR < -20$$: mild improvement bias</li>
+      <li>$$FAIR < -50$$: strong improvement regime (often stress-driven)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Using FAIR for Forward-Looking Evaluation (Event Backtesting)</h2>
+    <p>FAIR can be evaluated using objective events and simple warning rules.</p>
+
+    <h3>Crash-start events (rule-based)</h3>
+    <p>
+      A “crash start” may be defined as a local price peak followed by a drawdown of at least $$X\%$$ within $$Y$$ quarters,
+      with a minimum separation (cooldown) of $$C$$ quarters to avoid double-counting clustered peaks.
+    </p>
+
+    <h3>Illustrative warning rules</h3>
+    <p>Examples:</p>
+    <ul>
+      <li>A: sustained level stress: $$FAIR > 20$$ for 2 quarters</li>
+      <li>B: sustained acceleration: $$\Delta FAIR > 5$$ for 2 quarters</li>
+      <li>C: broad stress-worsening: $$FAIR > 0$$ and $$\Delta FAIR \ge 0$$</li>
+    </ul>
+
+    <h3>Metrics</h3>
+    <ul>
+      <li>Lead time (quarters) from the most recent signal to each crash start.</li>
+      <li>False-positive proxy: share of signal quarters not followed by any crash start within a forward window (e.g., 8 quarters).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Outputs and Visualisations (Reproducible)</h2>
+    <p>The FAIR build produces:</p>
+    <ul>
+      <li>a FAIR level figure (headline chart),</li>
+      <li>a component contributions figure (mechanism chart),</li>
+      <li>an animated direction-of-flow GIF emphasising $$\Delta FAIR_t$$,</li>
+      <li>and a tidy CSV export of intermediate series for auditability.</li>
+    </ul>
+
+    <h3>Figure placeholders</h3>
+    <p>Replace the filenames with the paths to the generated assets.</p>
+
+    <figure>
+      <!-- Replace src with your real path -->
+      <img src="fig_fair_level.png" alt="Home@ix FAIR (EW): Level" style="max-width:100%; height:auto;" />
+      <figcaption>
+        <strong>Figure 1.</strong> Home@ix FAIR (EW): Level. Baseline windows: 2003Q1–2007Q4 and 2013Q1–2019Q4; excludes 2008–2012 and 2020+.
+      </figcaption>
+    </figure>
+
+    <figure>
+      <!-- Replace src with your real path -->
+      <img src="fig_fair_contributions.png" alt="Home@ix FAIR (EW): Component contributions" style="max-width:100%; height:auto;" />
+      <figcaption>
+        <strong>Figure 2.</strong> Home@ix FAIR (EW): Component contributions. FAIR is the sum of wedge, turnover, and optional new-build terms.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Limitations and Extensions</h2>
+    <p>
+      FAIR is a reduced-form indicator derived from aggregate market series. It does not directly encode distributional constraints
+      (income heterogeneity, cash-buyer share, arrears microdata) or direct developer pacing series (e.g., sales per outlet per week)
+      unless explicitly added. These are natural extensions; the baseline FAIR specification is intentionally reproducible and captures two
+      dominant UK mechanisms: credit–price decoupling and thin-market clearing.
+    </p>
+  </section>
+
+  <section>
+    <h2>Conclusion</h2>
+    <p>
+      UK housing affordability is not only a price level problem; it is also an allocation and throughput problem. Home@ix FAIR provides a
+      transparent, reproducible way to detect when the system is shifting into a regime where affordability is likely to deteriorate over a
+      2–3 year horizon via credit–price decoupling and/or collapsing market depth. Combined with direction-of-flow and event backtesting,
+      FAIR is positioned as an operational forward-looking tool: a single “Number” grounded in auditable data and interpretable mechanisms.
+    </p>
+  </section>
+
+  <section>
+    <h2>Reproducibility Note</h2>
+    <p>The figures referenced in Section 8 are produced by the FAIR build scripts in the Home@ix workflow. The output directory should contain:</p>
+    <ul>
+      <li><code>fair_quarterly_audit.csv</code></li>
+      <li><code>fig_fair_level.png</code></li>
+      <li><code>fig_fair_contributions.png</code></li>
+      <li><code>anim_fair_direction_of_flow.gif</code></li>
+    </ul>
+  </section>
+    </section>
+
+    <hr />
+  </main>
+</body>
+</html>

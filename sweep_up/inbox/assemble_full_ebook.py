@@ -174,6 +174,10 @@ def part1_html() -> str:
     """
     Part I block injected before both papers.
     Figure paths are relative to index.html (figures/..).
+
+    NOTE on LaTeX in Python strings:
+    - Write LaTeX backslashes as double-backslashes, e.g. \\cdot, \\times
+      because sequences like \t are interpreted as escape codes in Python strings.
     """
     return """
 <section id="part1">
@@ -254,6 +258,102 @@ def part1_html() -> str:
     </section>
 
     <hr />
+
+<section id="part1-fig3">
+  <h3>Figure 3 — Mortgage outstanding composition by lender type (annual)</h3>
+  <p>
+    This exhibit shows how the stock of mortgage lending is distributed across lender types.
+    Shifts in composition matter because “credit availability” is not a single dial: it is mediated
+    by lender balance sheets, underwriting posture, and the kinds of borrowers each segment serves.
+  </p>
+  <figure>
+    <img src="figures/exhibit_3_mortgage_composition_annual.png"
+         alt="Exhibit 3 — Mortgage outstanding composition by lender type (annual, share of total)"
+         loading="lazy" />
+    <figcaption><strong>Figure 3.</strong> Mortgage outstanding composition by lender type (annual, share of total).</figcaption>
+  </figure>
+</section>
+<hr />
+
+<section id="homeix-identity">
+  <h2>Home@ix — The Identity (as developed) and the Reproducible Build</h2>
+
+  <p>
+    Home@ix uses accounting identities to describe the housing system as a throughput machine.
+    The point is not “math for effect”. The point is discipline: when the system is constrained by absorption, credit gates, delivery friction,
+    and value-capture reality, output behaves like a set of multipliers. If one dial is near zero, the product collapses.
+  </p>
+
+  <section id="homeix-identity-ams">
+    <h3>Identity 1: Affordable Market Supply (AMS)</h3>
+
+    <p>
+      We start with the supply identity: the affordable supply the system can deliver, given real-world throttles.
+    </p>
+
+    <p><strong>Affordable Market Supply</strong>:</p>
+    <p>$$AMS = (HM \\cdot P \\cdot AR \\cdot D \\cdot T \\cdot PVC) + HS$$</p>
+
+    <ul>
+      <li><strong>HM</strong>: housebuilding market capacity (deliverable output, not theoretical land)</li>
+      <li><strong>P</strong>: affordable proportion of delivery</li>
+      <li><strong>AR</strong>: absorption rate (how fast homes can be sold/let without destabilising price)</li>
+      <li><strong>D</strong>: diversity (tenure/product mix widening take-up)</li>
+      <li><strong>T</strong>: throughput (permission → start → completion conversion efficiency)</li>
+      <li><strong>PVC</strong>: planning value capture that works in practice</li>
+      <li><strong>HS</strong>: existing affordable housing stock</li>
+    </ul>
+  </section>
+
+  <section id="homeix-identity-an">
+    <h3>Identity 2: Affordable Housing Need (AN), derived</h3>
+
+    <p>
+      Need persists (and often rises) when supply is tethered to private-market throughput and absorption constraints.
+      Home@ix expresses this by introducing a sequencing/fast-tracking factor <strong>F</strong> and a stabiliser term:
+      a ring-fenced <strong>New Circuit of Credit</strong> (<strong>NCC</strong>) that funds affordable delivery without simply bidding up existing stock.
+    </p>
+
+    <p><strong>Start from the expanded form</strong>:</p>
+    <p>$$AN = HD + (HM \\cdot P \\cdot AR \\cdot D \\cdot T \\cdot PVC \\cdot F) + HS - AMS + NCC$$</p>
+
+    <p><strong>Substitute</strong> $$AMS = (HM \\cdot P \\cdot AR \\cdot D \\cdot T \\cdot PVC) + HS$$ <strong>and simplify</strong>:</p>
+    <p>$$AN = HD + (HM \\cdot P \\cdot AR \\cdot D \\cdot T \\cdot PVC \\cdot (F - 1)) + NCC$$</p>
+
+    <ul>
+      <li><strong>HD</strong>: HomeMaker effective demand (need in households, not only “bankable demand this quarter”)</li>
+      <li><strong>F</strong>: sequencing/fast-tracking factor (the sign convention is: baseline at $$F=1$$)</li>
+      <li><strong>NCC</strong>: New Circuit of Credit Creation (the stabiliser that decouples affordable supply from private-market freeze/thaw cycles)</li>
+    </ul>
+  </section>
+
+  <section id="repo-structure">
+    <h3>Reproducibility: from canonical inputs to the figures in this book</h3>
+
+    <p>
+      This repository is organised so a reader can move from source data to computed series to plotted exhibits—and regenerate the print bundle.
+      The print folder you are reading is a portable snapshot of that pipeline.
+    </p>
+
+    <ul>
+      <li><strong>Canonical inputs (source of truth):</strong> <code>inputs/canonical/</code></li>
+      <li><strong>Intermediate processing (rebuildable cache):</strong> <code>build/processed/</code></li>
+      <li><strong>Generated artefacts referenced by papers:</strong> <code>outputs/figures/</code>, <code>outputs/fair_assets/</code>, <code>outputs/draft_paper_assets/</code></li>
+      <li><strong>Portable publication bundle:</strong> <code>publication/print_*/</code> containing <code>index.html</code>, <code>figures/</code>, and copied <code>outputs/</code></li>
+    </ul>
+
+    <p>
+      Operationally, the maths “computes” as deterministic column derivations and transforms inside the Python scripts,
+      and the figures are the audit trail of those computations.
+    </p>
+
+    <ul>
+      <li><code>sweep_up/inbox/homeatix_annual_exhibits.py</code> — reads canonical data and generates the Part I exhibits into <code>figures/</code></li>
+      <li><code>sweep_up/inbox/assemble_full_ebook.py</code> — builds <code>publication/print_*</code>, copies required <code>outputs/</code> assets, and writes the combined <code>index.html</code></li>
+    </ul>
+  </section>
+</section>
+
 
     <section id="part1-fig4">
       <h3>Figure 4 — Indexed price vs indexed turnover (annual)</h3>
@@ -407,7 +507,11 @@ def main() -> None:
     window.MathJax = {{
       tex: {{
         displayMath: [['$$','$$']],
-        inlineMath: []
+        inlineMath: [['\\\\(','\\\\)']],
+      }},
+      options: {{
+        // Don't let MathJax try to interpret code blocks, etc.
+        skipHtmlTags: ['script','noscript','style','textarea','pre','code']
       }}
     }};
   </script>
