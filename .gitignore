@@ -48,3 +48,7 @@ publication/print_*/
 
 # Watermark backups (generated)
 publication/**/_backup_before_stamp_*/
+
+# Local scratch / patch files
+_pre_housekeeping.diff
+
