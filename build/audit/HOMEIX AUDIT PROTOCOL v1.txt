@@ -1,0 +1,25 @@
+﻿HOMEIX AUDIT PROTOCOL v1
+
+Purpose:
+- Verify filesystem state vs saved structure report.
+- Fingerprint canonical inputs + scripts (SHA256).
+- Record Python runtime + pip freeze.
+- Capture run logs for construct scripts.
+
+Artifacts written per run into: build/audit/<timestamp>/
+- homeix_structure_NOW_<timestamp>.txt
+- diff_structure_report.txt
+- hashes_inputs_canonical.csv
+- hashes_py_sweep_up.csv
+- python_runtime.txt
+- pip_freeze.txt
+- run_<scriptname>.log
+- audit_manifest.json
+
+Git:
+- After a successful audit run, commit and push:
+  - tools/audit_homeix.ps1
+  - AUDIT_PROTOCOL.md (optional if you keep it)
+  - build/audit/HOMEIX AUDIT PROTOCOL v1.txt
+  - Do NOT commit build/audit/<timestamp>/ (audit outputs stay local unless explicitly required)
+Last confirmed: 2026-03-01 06:43:45

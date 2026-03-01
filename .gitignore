@@ -24,3 +24,7 @@ Thumbs.db
 .env
 .env.*
 !build/audit/HOMEIX AUDIT PROTOCOL v1.txt
+# allow tracking the audit protocol file (build/ is ignored)
+!build/
+!build/audit/
+!build/audit/HOMEIX AUDIT PROTOCOL v1.txt
