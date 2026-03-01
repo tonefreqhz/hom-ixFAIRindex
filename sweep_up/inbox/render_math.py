@@ -1,4 +1,14 @@
-import matplotlib.pyplot as plt
+﻿import matplotlib.pyplot as plt
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 eq = r"""
 $\mathrm{ONS\ affordability:}\quad AR^{ONS}_t=\frac{\mathrm{Median\ house\ price}_t}{\mathrm{Median\ annual\ earnings}_t}$
@@ -19,5 +29,7 @@ fig.patch.set_facecolor("white")
 plt.axis("off")
 plt.text(0.02, 0.98, eq, va="top", fontsize=16)
 plt.tight_layout()
-plt.savefig("homeix_equations.png", bbox_inches="tight")
+(OUTPUTS_DIR / "figures").mkdir(parents=True, exist_ok=True)
+plt.savefig(OUTPUTS_DIR / "figures" / "homeix_equations.png", bbox_inches="tight")
 print("Wrote homeix_equations.png")
+

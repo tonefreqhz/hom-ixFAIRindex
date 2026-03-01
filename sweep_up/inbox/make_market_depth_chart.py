@@ -1,6 +1,16 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 # --- CONFIG: set your file path here ---
 CSV_PATH = r"C:\Users\peewe\OneDrive\Desktop\homeix\Homeatix housing market model(Sheet1) (4).csv"
@@ -53,7 +63,7 @@ latest_turn = float(annual.loc[annual["Year"] == latest_year, TURN_COL].iloc[0])
 
 pre = annual[annual["Year"].between(PRE_GFC_START, PRE_GFC_END)]
 if pre.empty:
-    raise ValueError(f"No data found in pre-GFC window {PRE_GFC_START}–{PRE_GFC_END}.")
+    raise ValueError(f"No data found in pre-GFC window {PRE_GFC_START}â€“{PRE_GFC_END}.")
 
 peak_row = pre.loc[pre[TURN_COL].idxmax()]
 peak_year = int(peak_row["Year"])
@@ -63,9 +73,9 @@ collapse_pct = (peak_turn - latest_turn) / peak_turn * 100
 
 # Print stats for your write-up
 print("=== Market Depth (Md) / Stock Turnover (% of stock) ===")
-print(f"Pre‑GFC peak ({PRE_GFC_START}–{PRE_GFC_END}): {peak_turn:.2f}% in {peak_year}")
+print(f"Preâ€‘GFC peak ({PRE_GFC_START}â€“{PRE_GFC_END}): {peak_turn:.2f}% in {peak_year}")
 print(f"Latest year in dataset: {latest_year} = {latest_turn:.2f}%")
-print(f"Collapse from pre‑GFC peak to {latest_year}: {collapse_pct:.1f}%")
+print(f"Collapse from preâ€‘GFC peak to {latest_year}: {collapse_pct:.1f}%")
 
 # --- Plot ---
 plt.style.use("seaborn-v0_8-whitegrid")
@@ -79,7 +89,7 @@ ax.scatter([latest_year], [latest_turn], color="#2A9D8F", s=90, zorder=5)
 
 # Annotate points
 ax.annotate(
-    f"Pre‑GFC peak\n{peak_turn:.2f}% ({peak_year})",
+    f"Preâ€‘GFC peak\n{peak_turn:.2f}% ({peak_year})",
     xy=(peak_year, peak_turn),
     xytext=(peak_year + 1, peak_turn + 0.6),
     arrowprops=dict(arrowstyle="->", color="#E63946", lw=1.5),
@@ -101,7 +111,7 @@ ax.annotate(
 # Big banner number
 ax.text(
     0.02, 0.92,
-    f"Liquidity collapse (vs pre‑GFC peak): −{collapse_pct:.1f}%",
+    f"Liquidity collapse (vs preâ€‘GFC peak): âˆ’{collapse_pct:.1f}%",
     transform=ax.transAxes,
     fontsize=20,
     fontweight="bold",
@@ -110,7 +120,7 @@ ax.text(
 )
 
 # Titles + axes
-ax.set_title("Market Depth (Md): Stock Turnover (% of Housing Stock), 1998–2023", fontsize=16, pad=12)
+ax.set_title("Market Depth (Md): Stock Turnover (% of Housing Stock), 1998â€“2023", fontsize=16, pad=12)
 ax.set_ylabel("Turnover (% of stock)", fontsize=12)
 ax.set_xlabel("")
 
@@ -123,14 +133,16 @@ ax.set_ylim(
 # Footnote/source
 fig.text(
     0.01, 0.01,
-    f"Source: Home@ix Potton model. Pre‑GFC peak defined as {PRE_GFC_START}–{PRE_GFC_END}. Latest available year: {latest_year}.",
+    f"Source: Home@ix Potton model. Preâ€‘GFC peak defined as {PRE_GFC_START}â€“{PRE_GFC_END}. Latest available year: {latest_year}.",
     ha="left", va="bottom", fontsize=10, color="#333333"
 )
 
 plt.tight_layout(rect=[0, 0.03, 1, 1])
 
 # Save outputs
-plt.savefig("homeix_market_depth_turnover_1998_2023.png", bbox_inches="tight")
+(OUTPUTS_DIR / "figures").mkdir(parents=True, exist_ok=True)
+plt.savefig(OUTPUTS_DIR / "figures" / "homeix_market_depth_turnover_1998_2023.png", bbox_inches="tight")
 plt.savefig("homeix_market_depth_turnover_1998_2023.svg", bbox_inches="tight")
 
 plt.show()
+
