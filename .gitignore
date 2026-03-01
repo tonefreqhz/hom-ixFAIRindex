@@ -55,3 +55,14 @@ _pre_housekeeping.diff
 
 # Generated sweep_up quarantine folders
 sweep_up/dedupe_quarantine*/
+# junk/build outputs
+.venv/
+**/__pycache__/
+build/
+outputs/
+publication/
+_reports/
+_epub_extract/
+sweep_up/old_prints_quarantine/
+sweep_up/inbox/outputs/
+sweep_up/inbox/publication/
