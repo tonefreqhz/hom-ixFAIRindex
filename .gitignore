@@ -28,3 +28,8 @@ Thumbs.db
 !build/
 !build/audit/
 !build/audit/HOMEIX AUDIT PROTOCOL v1.txt
+# keep all audit runs local
+build/audit/**
+
+# but track the protocol file
+!build/audit/HOMEIX AUDIT PROTOCOL v1.txt
