@@ -52,3 +52,6 @@ publication/**/_backup_before_stamp_*/
 # Local scratch / patch files
 _pre_housekeeping.diff
 
+
+# Generated sweep_up quarantine folders
+sweep_up/dedupe_quarantine*/
