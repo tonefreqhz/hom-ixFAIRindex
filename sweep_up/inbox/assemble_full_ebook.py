@@ -1,15 +1,68 @@
+﻿
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 # assemble_full_ebook.py
 from __future__ import annotations
 
+import argparse
 import re
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent  # this script's folder (currently sweep_up/inbox)
+# ---------------------------------------------------------------------
+# Bootstrap: resolve project root robustly from this file's location
+# This file lives at: <project_root>/sweep_up/inbox/assemble_full_ebook.py
+# ---------------------------------------------------------------------
+INBOX_DIR = Path(__file__).resolve().parent
+
+
+def find_project_root(start: Path) -> Path:
+    """
+    Walk upwards from `start` until we find a directory that looks like the repo root.
+
+    Heuristics (any is enough):
+    - contains sweep_up/ and publication/
+    - contains homeix_followup_paper.html or homeix_fair_paper.html
+    - contains inputs/ and outputs/
+    """
+    for p in [start, *start.parents]:
+        if (p / "sweep_up").is_dir() and (p / "publication").is_dir():
+            return p
+        if (p / "homeix_followup_paper.html").exists() or (p / "homeix_fair_paper.html").exists():
+            return p
+        if (p / "inputs").is_dir() and (p / "outputs").is_dir():
+            return p
+
+    # Fallback: assume <project_root>/sweep_up/inbox -> parents[1] is project root
+    # inbox -> sweep_up -> project_root
+    return start.parents[1]
+
+
+PROJECT_ROOT = find_project_root(INBOX_DIR).resolve()
+
+# Ensure project root is on sys.path so imports work from any CWD
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
+# ---------------------------------------------------------------------
+# Path anchors
+# ---------------------------------------------------------------------
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+BUILD_PROCESSED_DIR = PROJECT_ROOT / "build" / "processed"
+INPUTS_CANONICAL_DIR = PROJECT_ROOT / "inputs" / "canonical"
 
 
 def _read(p: Path) -> str:
@@ -35,7 +88,12 @@ def strip_base_tag(html: str) -> str:
 
 def strip_mathjax_scripts(html: str) -> str:
     # remove MathJax config blocks + the CDN loader, we'll add one unified config
-    html = re.sub(r"<script>\s*window\.MathJax\s*=\s*\{.*?\};\s*</script>", "", html, flags=re.I | re.S)
+    html = re.sub(
+        r"<script>\s*window\.MathJax\s*=\s*\{.*?\};\s*</script>",
+        "",
+        html,
+        flags=re.I | re.S,
+    )
     html = re.sub(r"<script[^>]+mathjax@3[^>]+></script>", "", html, flags=re.I)
     return html
 
@@ -49,21 +107,34 @@ def copy_if_exists(src: Path, dst: Path) -> None:
     print(f"[OK] Copied: {src.name} -> {dst}")
 
 
+def pick_first_existing(candidates: list[Path], label: str) -> Path:
+    for p in candidates:
+        if p.exists():
+            return p
+    msg = " / ".join(str(p) for p in candidates)
+    raise FileNotFoundError(f"Missing {label}. Looked in: {msg}")
+
+
 def run_annual_exhibits(outdir: Path) -> None:
     """
     Generate annual exhibits directly into the print bundle figures/ directory.
     """
     outdir.mkdir(parents=True, exist_ok=True)
 
-    # Adjust this to your actual canonical location over time.
-    # For now, keep your existing CSV name in inbox by default.
-    default_csv = ROOT / "Homeatix housing market model(Sheet1) (4).csv"
-    if not default_csv.exists():
-        print(f"[WARN] Annual CSV not found at: {default_csv}")
+    # Preferred canonical source
+    canonical_csv = INPUTS_CANONICAL_DIR / "homeatix_model.csv"
+
+    # Fallback to legacy local CSV (what your current script used)
+    legacy_csv = INBOX_DIR / "Homeatix housing market model(Sheet1) (4).csv"
+
+    csv_path = canonical_csv if canonical_csv.exists() else legacy_csv
+    if not csv_path.exists():
+        print(f"[WARN] Annual CSV not found at: {canonical_csv}")
+        print(f"[WARN] Annual CSV not found at: {legacy_csv}")
         print("       Annual exhibits will not be regenerated unless you fix the CSV path.")
         return
 
-    script = ROOT / "homeatix_annual_exhibits.py"
+    script = INBOX_DIR / "homeatix_annual_exhibits.py"
     if not script.exists():
         raise FileNotFoundError(f"Missing exhibit generator script: {script}")
 
@@ -71,7 +142,7 @@ def run_annual_exhibits(outdir: Path) -> None:
         sys.executable,
         str(script),
         "--csv",
-        str(default_csv),
+        str(csv_path),
         "--outdir",
         str(outdir),
     ]
@@ -79,14 +150,19 @@ def run_annual_exhibits(outdir: Path) -> None:
     subprocess.check_call(cmd)
 
 
-def bundle_extra_figures(inbox: Path, figures_dir: Path) -> None:
+def bundle_extra_figures(figures_dir: Path) -> None:
     """
     Copy any extra figures generated by other scripts (if present).
+    Priority: outputs/ (generated) then inbox/ (manual drop-ins).
     """
-    # Your uploaded quarterly cash-share chart (England vs Wales)
-    copy_if_exists(inbox / "england_wales_cash_share_quarterly.png", figures_dir / "england_wales_cash_share_quarterly.png")
-
-    # If you later standardise the cashshare diagnostic name differently, add it here.
+    copy_if_exists(
+        OUTPUTS_DIR / "england_wales_cash_share_quarterly.png",
+        figures_dir / "england_wales_cash_share_quarterly.png",
+    )
+    copy_if_exists(
+        INBOX_DIR / "england_wales_cash_share_quarterly.png",
+        figures_dir / "england_wales_cash_share_quarterly.png",
+    )
 
 
 def part1_html() -> str:
@@ -96,7 +172,7 @@ def part1_html() -> str:
     """
     return """
 <section id="part1">
-  <h2>Part I — The 2024 Foundations: Market Function Before Price</h2>
+  <h2>Part I â€” The 2024 Foundations: Market Function Before Price</h2>
 
   <p>
     Home@ix began from an observation that sounds simple but changes the whole measurement problem:
@@ -128,15 +204,15 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig1">
-      <h3>Figure 1 — Turnover and cash share (annual)</h3>
+      <h3>Figure 1 â€” Turnover and cash share (annual)</h3>
       <p>
-        Turnover is the housing market’s <strong>functionality / liquidity</strong> indicator: how many homes change hands relative to the stock.
+        Turnover is the housing marketâ€™s <strong>functionality / liquidity</strong> indicator: how many homes change hands relative to the stock.
         Cash share is a <strong>participation / exclusion</strong> indicator: when cash share rises alongside weak turnover, it is consistent with
         mortgage-dependent households being rationed out by rates, underwriting, or deposit constraints.
       </p>
       <figure>
         <img src="figures/exhibit_1_turnover_cashshare_annual.png"
-             alt="Exhibit 1 — Stock turnover (%) and cash share (annual)" loading="lazy" />
+             alt="Exhibit 1 â€” Stock turnover (%) and cash share (annual)" loading="lazy" />
         <figcaption><strong>Figure 1.</strong> Stock turnover and cash share (annual).</figcaption>
       </figure>
     </section>
@@ -144,15 +220,15 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig2a">
-      <h3>Figure 2a — Transaction levels: old stock vs new build (annual)</h3>
+      <h3>Figure 2a â€” Transaction levels: old stock vs new build (annual)</h3>
       <p>
-        “Housing activity” is not one market. Old stock dominates volume and is more <strong>credit- and chain-sensitive</strong>.
+        â€œHousing activityâ€ is not one market. Old stock dominates volume and is more <strong>credit- and chain-sensitive</strong>.
         New build volumes reflect additional constraints (planning, labour, build finance, developer pacing). The split helps distinguish
         <em>access/finance stress</em> from <em>delivery/capacity stress</em>.
       </p>
       <figure>
         <img src="figures/exhibit_2a_transaction_levels_annual.png"
-             alt="Exhibit 2a — Transaction levels: old stock vs new build (annual)" loading="lazy" />
+             alt="Exhibit 2a â€” Transaction levels: old stock vs new build (annual)" loading="lazy" />
         <figcaption><strong>Figure 2a.</strong> Transaction levels: old stock vs new build (annual).</figcaption>
       </figure>
     </section>
@@ -160,14 +236,14 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig2b">
-      <h3>Figure 2b — Transaction mix shares (annual)</h3>
+      <h3>Figure 2b â€” Transaction mix shares (annual)</h3>
       <p>
         Mix shares reveal <strong>compositional clearing</strong>: who is still able to transact when the market thins.
         Shifts in shares can signal allocation stress even when headline prices appear stable.
       </p>
       <figure>
         <img src="figures/exhibit_2b_transaction_mix_shares_annual.png"
-             alt="Exhibit 2b — Transaction mix shares (annual)" loading="lazy" />
+             alt="Exhibit 2b â€” Transaction mix shares (annual)" loading="lazy" />
         <figcaption><strong>Figure 2b.</strong> Transaction mix shares (annual).</figcaption>
       </figure>
     </section>
@@ -175,14 +251,14 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig4">
-      <h3>Figure 4 — Indexed price vs indexed turnover (annual)</h3>
+      <h3>Figure 4 â€” Indexed price vs indexed turnover (annual)</h3>
       <p>
         When turnover collapses, price indices can lag or understate stress because fewer transactions generate weaker price discovery.
         Liquidity risk becomes macro-relevant.
       </p>
       <figure>
         <img src="figures/exhibit_4_price_vs_turnover_index_annual.png"
-             alt="Exhibit 4 — House price vs turnover (indexed, annual)" loading="lazy" />
+             alt="Exhibit 4 â€” House price vs turnover (indexed, annual)" loading="lazy" />
         <figcaption><strong>Figure 4.</strong> Indexed price vs indexed turnover (annual).</figcaption>
       </figure>
     </section>
@@ -190,7 +266,7 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-cashshare-ew">
-      <h3>Supplement — Cash purchases share (England vs Wales, quarterly)</h3>
+      <h3>Supplement â€” Cash purchases share (England vs Wales, quarterly)</h3>
       <p>
         A cross-nation comparison helps separate broad regime shifts from local noise.
         Divergences can reflect geography-specific credit conditions, investor mix, or compositional effects.
@@ -210,7 +286,7 @@ def part1_html() -> str:
     <h3>2. Why this forces an accounting identity (and later, FAIR)</h3>
     <p>
       If the system clears through <strong>quantities and composition</strong> under stress, then an affordability framework must track access-to-finance
-      and market depth/throughput — not just price levels.
+      and market depth/throughput â€” not just price levels.
     </p>
     <div class="box">
       <strong>Bridge statement:</strong> Part I defines the failure mode (thin-market clearing). FAIR later converts that diagnosis into a reproducible quarterly monitor.
@@ -230,17 +306,56 @@ def part1_html() -> str:
 """.strip()
 
 
-def main():
-    follow = ROOT / "homeix_followup_paper.html"
-    fair = ROOT / "homeix_fair_paper.html"
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(
+        description="Assemble the full Home@ix print bundle into a publication/print_* folder."
+    )
+    p.add_argument(
+        "--outdir",
+        type=str,
+        default="",
+        help="Optional output directory. If omitted, a new publication/print_YYYYMMDD_HHMMSS folder is created.",
+    )
+    return p.parse_args()
 
-    if not follow.exists():
-        raise FileNotFoundError(f"Missing {follow}")
-    if not fair.exists():
-        raise FileNotFoundError(f"Missing {fair}")
 
-    outdir = Path.cwd()  # run with CWD = publication/print_$stamp
+def main() -> None:
+    args = parse_args()
+
+    if args.outdir.strip():
+        outdir = Path(args.outdir).expanduser().resolve()
+    else:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        outdir = (PUBLICATION_DIR / f"print_{stamp}").resolve()
+
     outdir.mkdir(parents=True, exist_ok=True)
+
+    print("ASSEMBLE PATHS")
+    print("  __file__:", Path(__file__).resolve())
+    print("  CWD:", Path.cwd().resolve())
+    print("  PROJECT_ROOT:", PROJECT_ROOT)
+    print("  INBOX_DIR:", INBOX_DIR)
+    print("  INPUTS_CANONICAL_DIR:", INPUTS_CANONICAL_DIR)
+    print("  BUILD_PROCESSED_DIR:", BUILD_PROCESSED_DIR)
+    print("  OUTPUTS_DIR:", OUTPUTS_DIR)
+    print("  PUBLICATION_DIR:", PUBLICATION_DIR)
+    print("  OUTDIR:", outdir)
+
+    follow = pick_first_existing(
+        [
+            PROJECT_ROOT / "homeix_followup_paper.html",
+            INBOX_DIR / "homeix_followup_paper.html",
+        ],
+        label="homeix_followup_paper.html",
+    )
+
+    fair = pick_first_existing(
+        [
+            PROJECT_ROOT / "homeix_fair_paper.html",
+            INBOX_DIR / "homeix_fair_paper.html",
+        ],
+        label="homeix_fair_paper.html",
+    )
 
     figures_dir = outdir / "figures"
     figures_dir.mkdir(parents=True, exist_ok=True)
@@ -248,8 +363,8 @@ def main():
     # 1) Regenerate exhibits into the bundle
     run_annual_exhibits(figures_dir)
 
-    # 2) Copy any additional figures that live in inbox
-    bundle_extra_figures(ROOT, figures_dir)
+    # 2) Copy any additional figures
+    bundle_extra_figures(figures_dir)
 
     # 3) Assemble HTML
     follow_html = strip_mathjax_scripts(strip_base_tag(_read(follow)))
@@ -258,7 +373,7 @@ def main():
     follow_body = extract_mainish(follow_html)
     fair_body = extract_mainish(fair_html)
 
-    stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    human_stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     known_issues = """
 <section class="box">
@@ -275,7 +390,7 @@ def main():
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Home@ix — Full Working Book (print bundle)</title>
+  <title>Home@ix â€” Full Working Book (print bundle)</title>
 
   <!-- MathJax (standardised to $$..$$) -->
   <script>
@@ -306,8 +421,8 @@ def main():
 <body>
   <main>
     <header>
-      <h1>Home@ix — Full Working Book (Draft)</h1>
-      <p class="meta"><strong>Print bundle:</strong> {outdir.name} &nbsp;|&nbsp; <strong>Built:</strong> {stamp}</p>
+      <h1>Home@ix â€” Full Working Book (Draft)</h1>
+      <p class="meta"><strong>Print bundle:</strong> {outdir.name} &nbsp;|&nbsp; <strong>Built:</strong> {human_stamp}</p>
     </header>
 
     {known_issues}

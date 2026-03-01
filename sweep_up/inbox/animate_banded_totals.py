@@ -1,7 +1,17 @@
-import os
+﻿import os
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
@@ -233,7 +243,7 @@ def main():
 
         ax.set_ylim(0, ymax)
         ax.set_title(
-            "Volumes of Sales by Price Band — England & Wales (Grand Total per year)",
+            "Volumes of Sales by Price Band â€” England & Wales (Grand Total per year)",
             loc="left",
             fontsize=14,
         )
@@ -248,14 +258,14 @@ def main():
         )
 
         ax.set_ylabel("Number of sales")
-        ax.set_xlabel("Price band (£)")
+        ax.set_xlabel("Price band (Â£)")
         ax.set_xticks(x)
         ax.set_xticklabels([str(b) for b in bands], rotation=45, ha="right")
         ax.grid(True, axis="y", alpha=0.25)
 
         ax.legend(
             handles=legend_handles,
-            title="Price band key (£)",
+            title="Price band key (Â£)",
             loc="upper left",
             bbox_to_anchor=(1.01, 1.0),
             frameon=True,

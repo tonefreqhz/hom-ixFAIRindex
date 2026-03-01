@@ -1,6 +1,16 @@
 ﻿from __future__ import annotations
 
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
+
+from pathlib import Path
 import shutil
 
 PROJECT = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix")

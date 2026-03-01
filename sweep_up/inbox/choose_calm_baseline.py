@@ -1,6 +1,16 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 # ------------------ paths ------------------
 IN_Q = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly.csv")

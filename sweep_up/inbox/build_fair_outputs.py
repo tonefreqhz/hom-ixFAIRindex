@@ -1,8 +1,18 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 
 # ============================================================
@@ -172,8 +182,8 @@ ax.axhline(0, color="grey", linewidth=1, alpha=0.7)
 for y in [50, 20, -20, -50]:
     ax.axhline(y, color="tab:blue", linewidth=1, alpha=0.18)
 
-ax.set_title("Home@ix FAIR (England & Wales): level (baseline excludes 2008–2012 and 2020+)")
-ax.set_ylabel("FAIR (z-scored vs pooled baseline; scaled ×100)")
+ax.set_title("Home@ix FAIR (England & Wales): level (baseline excludes 2008â€“2012 and 2020+)")
+ax.set_ylabel("FAIR (z-scored vs pooled baseline; scaled Ã—100)")
 ax.set_xlabel("Quarter")
 ax.legend(loc="upper left")
 fig.tight_layout()
@@ -207,7 +217,7 @@ plt.close(fig)
 
 
 # ============================================================
-# ANIMATION: “direction of flow” (ΔFAIR)
+# ANIMATION: â€œdirection of flowâ€ (Î”FAIR)
 # ============================================================
 anim_df = g.dropna(subset=["FAIR"]).reset_index(drop=True)
 WINDOW = 48
@@ -228,8 +238,8 @@ pt = ax1.scatter([], [], s=65, color="tab:red", zorder=5)
 bar = ax2.bar([0], [0], color="tab:purple", width=0.6)[0]
 ax2.axhline(0, color="grey", linewidth=1, alpha=0.7)
 ax2.set_xticks([0])
-ax2.set_xticklabels(["Current ΔFAIR"])
-ax2.set_ylabel("ΔFAIR")
+ax2.set_xticklabels(["Current Î”FAIR"])
+ax2.set_ylabel("Î”FAIR")
 
 ymin = float(np.nanmin(anim_df["FAIR"])) * 1.1
 ymax = float(np.nanmax(anim_df["FAIR"])) * 1.1
@@ -274,7 +284,7 @@ def update(i):
 
     q = anim_df["p"].iloc[i].to_period("Q")
     fair_now = float(anim_df["FAIR"].iloc[i])
-    ax1.set_title(f"Home@ix FAIR (EW) — {q} | FAIR={fair_now:.1f} | ΔFAIR={d:.1f}")
+    ax1.set_title(f"Home@ix FAIR (EW) â€” {q} | FAIR={fair_now:.1f} | Î”FAIR={d:.1f}")
 
     return (line_fair, pt, bar)
 

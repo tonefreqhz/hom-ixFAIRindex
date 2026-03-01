@@ -1,7 +1,17 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 # ---------------- Paths ----------------
 FEATURES_PATH = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_fair.csv")
@@ -104,7 +114,7 @@ def backtest_fair_warning(
 
     # Signals (draft defaults; calibrate as needed)
     sig_A = (fair > 20).rolling(2).mean() == 1.0        # FAIR > 20 for 2Q
-    sig_B = (d_fair > 5).rolling(2).mean() == 1.0       # ΔFAIR > 5 for 2Q
+    sig_B = (d_fair > 5).rolling(2).mean() == 1.0       # Î”FAIR > 5 for 2Q
     sig_C = (fair > 0) & (d_fair >= 0)                  # stress + worsening
 
     # --- Crisis regime onsets (manual / paper-aligned) ---
@@ -334,8 +344,8 @@ while affordability / stress regimes can worsen materially (the focus of this wo
 Signals (current draft)
 -----------------------
 A: FAIR > 20 for 2 consecutive quarters
-B: ΔFAIR > 5 for 2 consecutive quarters
-C: FAIR > 0 AND ΔFAIR >= 0
+B: Î”FAIR > 5 for 2 consecutive quarters
+C: FAIR > 0 AND Î”FAIR >= 0
 
 Lead time definition
 --------------------

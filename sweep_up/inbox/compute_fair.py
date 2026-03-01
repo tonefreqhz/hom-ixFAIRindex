@@ -2,6 +2,16 @@
 import pandas as pd
 from pathlib import Path
 
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
+
 IN_FEAT = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_wedge.csv")
 OUT_FEAT = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_fair.csv")
 OUT_BASE = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\fair_summary_baseline_stats.csv")

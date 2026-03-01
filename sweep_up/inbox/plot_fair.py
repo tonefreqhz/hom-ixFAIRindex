@@ -1,9 +1,19 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.animation import FuncAnimation
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 # ---------------- Paths ----------------
 IN = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_fair.csv")
@@ -18,7 +28,7 @@ def add_logo(ax, img=LOGO, zoom=0.14, alpha=0.85, loc="lower right", pad=0.02):
     """
     Adds a logo image as an inset axes in axes-fraction coordinates.
 
-    zoom: size as fraction of axes (roughly square box). Try 0.10–0.18.
+    zoom: size as fraction of axes (roughly square box). Try 0.10â€“0.18.
     pad: distance from edges in axes fraction.
     loc: 'lower right', 'lower left', 'upper right', 'upper left'
     """
@@ -54,8 +64,8 @@ g_plot = g[g["q"] <= cutoff_q].copy()
 g_plot["p"] = g_plot["q"].dt.to_timestamp("Q")
 
 # ---- Figure subtitle (self-contained metadata) ----
-BASELINE_TXT = "Baseline z-score windows: 2003Q1–2007Q4, 2013Q1–2019Q4"
-WEIGHTS_TXT  = "Weights: 0.55 wedge, −0.35 turnover, 0.10 new-build (optional)"
+BASELINE_TXT = "Baseline z-score windows: 2003Q1â€“2007Q4, 2013Q1â€“2019Q4"
+WEIGHTS_TXT  = "Weights: 0.55 wedge, âˆ’0.35 turnover, 0.10 new-build (optional)"
 TAIL_TXT     = f"Charts exclude provisional tail: last {TAIL_EXCLUDE_Q} quarters"
 subtitle = f"{BASELINE_TXT} | {WEIGHTS_TXT} | {TAIL_TXT}"
 
@@ -85,7 +95,7 @@ for lo, hi, c in outer + bands:
         ax.axhspan(lo2, hi2, color=c, zorder=0)
 
 ax.axhline(0, color="#666", lw=1)
-ax.set_title(f"Home@ix FAIR — Level (geo={geo})")
+ax.set_title(f"Home@ix FAIR â€” Level (geo={geo})")
 ax.set_ylabel("FAIR (index)")
 ax.grid(True, alpha=0.25)
 ax.legend(loc="upper left")
@@ -119,7 +129,7 @@ ax.stackplot(
 )
 ax.plot(x, g_plot["FAIR"], color="black", lw=2.0, label="FAIR (sum)")
 ax.axhline(0, color="#666", lw=1)
-ax.set_title(f"Home@ix FAIR — Component Contributions (geo={geo})")
+ax.set_title(f"Home@ix FAIR â€” Component Contributions (geo={geo})")
 ax.set_ylabel("Contribution to FAIR")
 ax.grid(True, alpha=0.25)
 ax.legend(loc="upper left")
@@ -143,12 +153,12 @@ g_plot["dFAIR_s"] = g_plot["dFAIR"].fillna(0.0)
 
 # Color by LEVEL (stress), marker by DIRECTION (flow)
 dot_colors  = np.where(g_plot["FAIR"].values > 0, "#ff6b6b", "#4dabf7")     # red=stress, blue=easing
-dot_markers = np.where(g_plot["dFAIR_s"].values >= 0, "^", "v")            # ▲ worsening, ▼ improving
+dot_markers = np.where(g_plot["dFAIR_s"].values >= 0, "^", "v")            # â–² worsening, â–¼ improving
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(g_plot["p"], g_plot["FAIR"], lw=2.0, color="black")
 ax.axhline(0, color="#666", lw=1)
-ax.set_title(f"Home@ix FAIR — Level (color) + Flow (marker) (geo={geo})")
+ax.set_title(f"Home@ix FAIR â€” Level (color) + Flow (marker) (geo={geo})")
 ax.set_ylabel("FAIR (index)")
 ax.grid(True, alpha=0.25)
 
@@ -189,7 +199,7 @@ def update(i):
     dot.set_color(dot_colors[i])
     dot.set_marker(dot_markers[i])
 
-    txt.set_text(f"{g_plot['period'].iloc[i]}  FAIR={yi: .1f}   Δ={d: .1f}")
+    txt.set_text(f"{g_plot['period'].iloc[i]}  FAIR={yi: .1f}   Î”={d: .1f}")
     return dot, txt, meta, logo_artist
 
 # NOTE: blit=False is more reliable with inset/logo artists

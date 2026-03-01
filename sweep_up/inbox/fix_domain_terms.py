@@ -1,6 +1,16 @@
-from pathlib import Path
+﻿from pathlib import Path
 import numpy as np
 import pandas as pd
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 ROOT = Path(__file__).resolve().parent
 
@@ -49,7 +59,7 @@ fq["geo_norm"] = (
 fq = fq.loc[fq["geo_norm"].eq(GEO)].copy()
 print("Rows after geo filter:", len(fq))
 
-# --- mortgages: £m -> £bn ---
+# --- mortgages: Â£m -> Â£bn ---
 if "mb_total_gbp_m" not in fq.columns:
     raise KeyError(f"mb_total_gbp_m not found. Columns: {fq.columns.tolist()}")
 fq["mortgage_stock_gbp_bn"] = pd.to_numeric(fq["mb_total_gbp_m"], errors="coerce") / 1000.0
@@ -186,7 +196,7 @@ if len(out) != 2:
     raise ValueError(f"Expected 2 rows for {STATE1},{STATE2}; got {len(out)} rows.\n{out}")
 
 delta = out.iloc[1].copy()
-delta["period"] = "Δ (End - Start)"
+delta["period"] = "Î” (End - Start)"
 for c in keep[1:]:
     if c.endswith("_is_ffill"):
         delta[c] = ""

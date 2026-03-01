@@ -1,5 +1,15 @@
-import pandas as pd
+﻿import pandas as pd
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 xlsx = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\datadownload.xlsx")
 sheet = "Median workplace ratio"

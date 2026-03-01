@@ -1,5 +1,15 @@
+﻿
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 # make_ons_fig3_three_panel_median_and_lq.py
-# Rebuild ONS Fig 3-style three-panel animated histograms (Median + LQ), 1997–2024.
+# Rebuild ONS Fig 3-style three-panel animated histograms (Median + LQ), 1997â€“2024.
 
 import os
 import re
@@ -102,7 +112,7 @@ def read_sheet_with_detected_header(xlsx_path: str, sheet_name: str):
 def extract_year_columns(df: pd.DataFrame):
     """
     Return list of (year:int, column_name) for columns whose header starts with a year,
-    e.g. "1997", "1997 Ratio", "1997 £".
+    e.g. "1997", "1997 Ratio", "1997 Â£".
     """
     out = []
     for c in df.columns:
@@ -198,7 +208,7 @@ def make_three_panel_mp4(
 
     # Title and sheet metadata (optional)
     fig.suptitle(
-        f"ONS Fig 3 (rebuilt): LA distributions over time — {kind.upper()} series",
+        f"ONS Fig 3 (rebuilt): LA distributions over time â€” {kind.upper()} series",
         fontsize=16,
         y=0.98,
     )
@@ -242,13 +252,13 @@ def make_three_panel_mp4(
     setup_axis(
         ax_earn,
         f"Workplace earnings ({spec['earnings']['suffix']})",
-        "£",
+        "Â£",
         earn_xlim,
     )
     setup_axis(
         ax_price,
         f"House price ({spec['price']['suffix']})",
-        "£",
+        "Â£",
         price_xlim,
     )
 
@@ -294,7 +304,7 @@ def make_three_panel_mp4(
             spec["earnings"]["bins"],
             earn_xlim,
             f"Workplace earnings ({spec['earnings']['suffix']})",
-            "£",
+            "Â£",
         )
         draw_hist(
             ax_price,
@@ -302,7 +312,7 @@ def make_three_panel_mp4(
             spec["price"]["bins"],
             price_xlim,
             f"House price ({spec['price']['suffix']})",
-            "£",
+            "Â£",
         )
 
         # Re-add the year label inside top axis after cla()
@@ -343,14 +353,14 @@ def main():
 
     median_spec = {
         "ratio": {"sheet": "Median workplace ratio", "suffix": "Median", "bins": BINS_RATIO},
-        "earnings": {"sheet": "Median workplace earning (£)", "suffix": "Median (£)", "bins": BINS_EARN},
-        "price": {"sheet": "Median house price (£)", "suffix": "HP (£)", "bins": BINS_HP},
+        "earnings": {"sheet": "Median workplace earning (Â£)", "suffix": "Median (Â£)", "bins": BINS_EARN},
+        "price": {"sheet": "Median house price (Â£)", "suffix": "HP (Â£)", "bins": BINS_HP},
     }
 
     lq_spec = {
         "ratio": {"sheet": "LQ workplace ratio", "suffix": "LQ", "bins": BINS_RATIO},
-        "earnings": {"sheet": "LQ workplace earning (£)", "suffix": "LQ (£)", "bins": BINS_EARN},
-        "price": {"sheet": "LQ house price (£)", "suffix": "HP (£)", "bins": BINS_HP},
+        "earnings": {"sheet": "LQ workplace earning (Â£)", "suffix": "LQ (Â£)", "bins": BINS_EARN},
+        "price": {"sheet": "LQ house price (Â£)", "suffix": "HP (Â£)", "bins": BINS_HP},
     }
 
     make_three_panel_mp4(

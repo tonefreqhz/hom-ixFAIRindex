@@ -1,5 +1,15 @@
-import pandas as pd
+﻿import pandas as pd
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 # Plotting (PNG output)
 import matplotlib
@@ -184,7 +194,7 @@ def write_interpretation(cash_prop: pd.DataFrame, out_txt: Path) -> None:
         return "n/a" if x is None else f"{x:+.2f} pp"
 
     lines = []
-    lines.append("Cash purchases as a proportion of total transactions — interpretation")
+    lines.append("Cash purchases as a proportion of total transactions â€” interpretation")
     lines.append("=" * 72)
     lines.append("")
     lines.append("What this metric is:")
@@ -244,7 +254,7 @@ def write_interpretation(cash_prop: pd.DataFrame, out_txt: Path) -> None:
     lines.append("  - First-time buyer and mortgaged mover activity is stronger relative to cash buyers.")
     lines.append("")
 
-    # A little more “so what”, using observed direction if present
+    # A little more â€œso whatâ€, using observed direction if present
     lines.append("What your most recent movement implies (based on 1-year change):")
     if stats_eng.get("available"):
         if eng_dir_1y == "up":
@@ -255,7 +265,7 @@ def write_interpretation(cash_prop: pd.DataFrame, out_txt: Path) -> None:
             lines.append("  That leans toward improving mortgage accessibility/costs, or a rebound in mortgaged buyers.")
         else:
             lines.append(f"- England: cash share is broadly flat over 1y ({fmt_pp(stats_eng['chg_1y'])}).")
-            lines.append("  That suggests the balance between cash and mortgaged buyers hasn’t shifted much recently.")
+            lines.append("  That suggests the balance between cash and mortgaged buyers hasnâ€™t shifted much recently.")
     if stats_wal.get("available"):
         if wal_dir_1y == "up":
             lines.append(f"- Wales: cash share is rising over 1y ({fmt_pp(stats_wal['chg_1y'])}).")
@@ -270,7 +280,7 @@ def write_interpretation(cash_prop: pd.DataFrame, out_txt: Path) -> None:
 
     lines.append("Caveats (worth keeping you honest):")
     lines.append("- This is a *share*: it can rise even if cash purchases are flat, as long as mortgage purchases fall.")
-    lines.append("- Cash vs mortgage is only one slice; it doesn’t tell you whether buyers are investors vs owner-occupiers.")
+    lines.append("- Cash vs mortgage is only one slice; it doesnâ€™t tell you whether buyers are investors vs owner-occupiers.")
     lines.append("- If totals differ from new+existing counts, treat mix comparisons cautiously (the dataset can have quirks).")
     lines.append("")
 

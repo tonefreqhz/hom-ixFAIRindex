@@ -1,6 +1,16 @@
-import os
+﻿import os
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 # ---------
 # CONFIG
@@ -75,7 +85,7 @@ domain = pd.DataFrame([snapshot_row(s1), snapshot_row(s2)])
 
 # Add deltas for readability
 delta = domain.iloc[1].copy()
-delta["period"] = "Δ (End - Start)"
+delta["period"] = "Î” (End - Start)"
 for c in [
     "mortgage_stock_gbp_bn",
     "dwellings_m",
@@ -101,8 +111,8 @@ plt.figure(figsize=(10, 4.5))
 plt.plot(df["period"], df["mb_total_gbp_m"] / 1000.0, linewidth=2)
 plt.axvline(START_PERIOD, color="black", linestyle="--", linewidth=1)
 plt.axvline(END_PERIOD, color="black", linestyle="--", linewidth=1)
-plt.title(f"Mortgage stock outstanding (£bn) — {GEO}")
-plt.ylabel("£bn")
+plt.title(f"Mortgage stock outstanding (Â£bn) â€” {GEO}")
+plt.ylabel("Â£bn")
 plt.xticks(df["period"][::8], rotation=45, ha="right")
 plt.tight_layout()
 plt.savefig(os.path.join(OUT_FIG, "fig_domain_mortgage_stock_gbp_bn.png"), dpi=160)
@@ -115,7 +125,7 @@ plt.figure(figsize=(10, 4.5))
 plt.plot(df["period"], df["turnover_pct_q"], linewidth=2)
 plt.axvline(START_PERIOD, color="black", linestyle="--", linewidth=1)
 plt.axvline(END_PERIOD, color="black", linestyle="--", linewidth=1)
-plt.title(f"Market depth (turnover, % per quarter) — {GEO}")
+plt.title(f"Market depth (turnover, % per quarter) â€” {GEO}")
 plt.ylabel("% of stock per quarter")
 plt.xticks(df["period"][::8], rotation=45, ha="right")
 plt.tight_layout()

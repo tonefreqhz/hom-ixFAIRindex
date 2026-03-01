@@ -1,5 +1,15 @@
-import argparse
+﻿import argparse
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 import pandas as pd
 import numpy as np
@@ -60,7 +70,7 @@ def month_to_num(x) -> float:
         "dec": 12, "december": 12,
     }
 
-    # Allow "Dec-23" / "Dec 2023" style tokens
+    # Allow "Dec-23" / "Dec 2023" / "Dec/2023" style tokens
     token = s.split()[0].split("-")[0].split("/")[0]
     return mapping.get(token, np.nan)
 
@@ -75,7 +85,9 @@ def main():
     # Load + clean
     # -----------------------
     df = pd.read_csv(csv_path, encoding="cp1252")
-    df = df.replace(["nul", "NUL", "null", "NULL", ""], np.nan)
+
+    # Normalize common "blank" tokens, including non-breaking space variants seen in your file
+    df = df.replace(["nul", "NUL", "null", "NULL", "", " ", "\xa0", "Â "], np.nan)
 
     # Coerce numeric where possible (keep Month as-is for parsing)
     for c in df.columns:
@@ -85,26 +97,58 @@ def main():
     if "Year" not in df.columns:
         raise ValueError("Expected a 'Year' column in the canonical CSV.")
 
+    has_month_col = "Month" in df.columns
+
+    # -----------------------
     # Split blocks:
     # - Annual block: Year present AND Month missing
-    # - Monthly block: Year present AND Month present
-    has_month_col = "Month" in df.columns
+    # - Monthly block: Prefer parsing Month as a date (e.g. 01/12/1999) and deriving Year/MonthNum from it
+    # -----------------------
     if has_month_col:
         annual = df[df["Year"].notna() & df["Month"].isna()].copy()
-        monthly = df[df["Year"].notna() & df["Month"].notna()].copy()
+
+        monthly_raw = df[df["Month"].notna()].copy()
+
+        # Parse Month as date strings like "01/12/1999"
+        monthly_raw["MonthDate"] = pd.to_datetime(monthly_raw["Month"], errors="coerce", dayfirst=True)
+
+        # Case A: Month is a real date string -> derive MonthNum and Year (fill Year if missing)
+        monthly_raw["MonthNum"] = np.nan
+        mask_dt = monthly_raw["MonthDate"].notna()
+        if mask_dt.any():
+            monthly_raw.loc[mask_dt, "MonthNum"] = monthly_raw.loc[mask_dt, "MonthDate"].dt.month
+            # If Year is missing on monthly rows (your case), derive from MonthDate
+            monthly_raw.loc[mask_dt, "Year"] = monthly_raw.loc[mask_dt, "MonthDate"].dt.year
+
+        # Case B: Month isn't parseable as a date -> fall back to month_to_num (requires Year present)
+        mask_nodt = ~mask_dt
+        if mask_nodt.any():
+            monthly_raw.loc[mask_nodt, "MonthNum"] = monthly_raw.loc[mask_nodt, "Month"].map(month_to_num)
+
+        # Keep only usable monthly rows
+        monthly = monthly_raw[
+            monthly_raw["Year"].notna() & monthly_raw["MonthNum"].notna()
+        ].copy()
+
+        # Normalize Year to integer (nullable), then to plain int for plotting/sorting
+        annual["Year"] = pd.to_numeric(annual["Year"], errors="coerce").astype("Int64")
+        annual = annual.dropna(subset=["Year"]).copy()
+        annual["Year"] = annual["Year"].astype(int)
+        annual = annual.sort_values("Year")
+
+        monthly["Year"] = pd.to_numeric(monthly["Year"], errors="coerce").astype("Int64")
+        monthly = monthly.dropna(subset=["Year"]).copy()
+        monthly["Year"] = monthly["Year"].astype(int)
+        monthly["MonthNum"] = pd.to_numeric(monthly["MonthNum"], errors="coerce")
+        monthly = monthly.sort_values(["Year", "MonthNum"])
     else:
         # If no Month column exists, treat everything with Year as annual
         annual = df[df["Year"].notna()].copy()
+        annual["Year"] = pd.to_numeric(annual["Year"], errors="coerce").astype("Int64")
+        annual = annual.dropna(subset=["Year"]).copy()
+        annual["Year"] = annual["Year"].astype(int)
+        annual = annual.sort_values("Year")
         monthly = df.iloc[0:0].copy()
-
-    annual["Year"] = annual["Year"].astype(int)
-    annual = annual.sort_values("Year")
-
-    # Prepare monthly MonthNum if available
-    if not monthly.empty and has_month_col:
-        monthly["Year"] = monthly["Year"].astype(int)
-        monthly["MonthNum"] = monthly["Month"].map(month_to_num)
-        monthly = monthly.sort_values(["Year", "MonthNum"])
 
     # -----------------------
     # Derived annual fields
@@ -131,7 +175,7 @@ def main():
     annual["old_stock_share"] = 1 - annual["new_build_share"]
 
     # -----------------------
-    # Exhibit 1 — Turnover & cash share
+    # Exhibit 1 â€” Turnover & cash share
     # -----------------------
     fig, ax1 = plt.subplots(figsize=(11, 5))
     ax1.plot(annual["Year"], annual["stock_turnover_ PCT"], color="navy", lw=2, label="Stock turnover (%)")
@@ -144,18 +188,18 @@ def main():
     ax2.set_ylabel("Cash share", color="darkorange")
     ax2.tick_params(axis="y", labelcolor="darkorange")
 
-    ax1.set_title("Exhibit 1 — Stock turnover (%) and cash share (annual)")
+    ax1.set_title("Exhibit 1 â€” Stock turnover (%) and cash share (annual)")
     plt.tight_layout()
     plt.savefig(outdir / "exhibit_1_turnover_cashshare_annual.png", dpi=200)
     plt.close()
 
     # -----------------------
-    # Exhibit 2a — Transaction levels (old vs new)
+    # Exhibit 2a â€” Transaction levels (old vs new)
     # -----------------------
     fig, ax = plt.subplots(figsize=(11, 5))
     ax.plot(annual["Year"], annual["total_old_stock"], label="Old stock transactions", color="slategray", lw=2)
     ax.plot(annual["Year"], annual["total_new_build"], label="New build transactions", color="crimson", lw=2)
-    ax.set_title("Exhibit 2a — Transaction levels: old stock vs new build (annual)")
+    ax.set_title("Exhibit 2a â€” Transaction levels: old stock vs new build (annual)")
     ax.set_ylabel("Transactions")
     ax.grid(True, alpha=0.2)
     ax.legend()
@@ -164,12 +208,12 @@ def main():
     plt.close()
 
     # -----------------------
-    # Exhibit 2b — Transaction mix shares
+    # Exhibit 2b â€” Transaction mix shares
     # -----------------------
     fig, ax = plt.subplots(figsize=(11, 5))
     ax.plot(annual["Year"], annual["new_build_share"], label="New build share", color="crimson", lw=2)
     ax.plot(annual["Year"], annual["old_stock_share"], label="Old stock share", color="slategray", lw=2)
-    ax.set_title("Exhibit 2b — Transaction mix: shares (annual)")
+    ax.set_title("Exhibit 2b â€” Transaction mix: shares (annual)")
     ax.set_ylabel("Share of transactions")
     ax.set_ylim(0, 1)
     ax.grid(True, alpha=0.2)
@@ -179,7 +223,7 @@ def main():
     plt.close()
 
     # -----------------------
-    # Exhibit 3 — Mortgage composition (annual; else Dec from monthly)
+    # Exhibit 3 â€” Mortgage composition (annual; else Dec from monthly)
     # -----------------------
     mort_cols = [
         "mb_banks_gbp",
@@ -229,7 +273,7 @@ def main():
             labels=["Banks", "Building societies", "Specialist lenders", "Others"],
             alpha=0.9,
         )
-        ax.set_title("Exhibit 3 — Mortgage outstanding composition by lender type (annual, share of total)")
+        ax.set_title("Exhibit 3 â€” Mortgage outstanding composition by lender type (annual, share of total)")
         ax.set_ylabel("Share")
         ax.set_ylim(0, 1)
         ax.grid(True, alpha=0.2)
@@ -244,7 +288,7 @@ def main():
         )
 
     # -----------------------
-    # Exhibit 4 — House price vs turnover (indexed)
+    # Exhibit 4 â€” House price vs turnover (indexed)
     # -----------------------
     fig, ax = plt.subplots(figsize=(11, 5))
     if "avg_house_price_gbp_england_wales" in annual.columns:
@@ -264,7 +308,7 @@ def main():
         lw=2,
     )
 
-    ax.set_title("Exhibit 4 — House price vs turnover (indexed, annual)")
+    ax.set_title("Exhibit 4 â€” House price vs turnover (indexed, annual)")
     ax.set_ylabel("Index (base year = 100)")
     ax.grid(True, alpha=0.2)
     ax.legend()

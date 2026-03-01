@@ -1,5 +1,15 @@
-import pandas as pd
+﻿import pandas as pd
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 import matplotlib
 matplotlib.use("Agg")
@@ -69,7 +79,7 @@ def main():
         data["cash_share_pct"],
         linewidth=2.2,
         color="#F58518",
-        label="Cash share (%) — all quarters"
+        label="Cash share (%) â€” all quarters"
     )
 
     if not settled.empty:
@@ -79,7 +89,7 @@ def main():
             linewidth=2.2,
             linestyle="--",
             color="#E45756",
-            label=f"Cash share (%) — excluding last {LAG_QUARTERS} quarters"
+            label=f"Cash share (%) â€” excluding last {LAG_QUARTERS} quarters"
         )
 
     # Shade lag window

@@ -1,4 +1,14 @@
-from __future__ import annotations
+﻿from __future__ import annotations
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 from pathlib import Path
 
@@ -133,7 +143,7 @@ def load_domain() -> pd.DataFrame:
       - period: 'YYYYQ#'
       - _p: period[Q]
       - date: Timestamp at quarter start
-    Filters out any non-quarter junk rows (e.g., 'Δ (End - Start)').
+    Filters out any non-quarter junk rows (e.g., 'Î” (End - Start)').
     """
     _require(DOMAIN_CSV)
     df = pd.read_csv(DOMAIN_CSV)
@@ -179,8 +189,8 @@ def fig_mortgage_stock(domain: pd.DataFrame):
 
     plt.figure()
     plt.plot(domain["date"], domain[col], lw=2)
-    plt.title("Mortgage stock outstanding (£bn) — EW")
-    plt.ylabel("£bn")
+    plt.title("Mortgage stock outstanding (Â£bn) â€” EW")
+    plt.ylabel("Â£bn")
     plt.xlabel("")
 
     # Optional markers (matches your draft visuals)
@@ -201,7 +211,7 @@ def fig_turnover(domain: pd.DataFrame):
 
     plt.figure()
     plt.plot(domain["date"], domain[col], lw=2)
-    plt.title("Market depth (turnover, % per quarter) — EW")
+    plt.title("Market depth (turnover, % per quarter) â€” EW")
     plt.ylabel("% of stock per quarter")
     plt.xlabel("")
 
@@ -226,7 +236,7 @@ def fig_fair_level(domain: pd.DataFrame):
     plt.axhspan(-500, -50, color="#9dc3e6", alpha=0.25, zorder=0)
 
     plt.plot(domain["date"], domain[fair_col], color="black", lw=2, label="FAIR")
-    plt.title("Home@ix FAIR — Level (geo=EW)")
+    plt.title("Home@ix FAIR â€” Level (geo=EW)")
     plt.ylabel("FAIR (index)")
     plt.xlabel("")
     plt.legend(loc="upper left")
@@ -266,7 +276,7 @@ def fig_fair_contrib(domain: pd.DataFrame):
 
     plt.plot(domain["date"], domain[fair_col], color="black", lw=2, label="FAIR (sum)")
 
-    plt.title("Home@ix FAIR — Component Contributions (geo=EW)")
+    plt.title("Home@ix FAIR â€” Component Contributions (geo=EW)")
     plt.ylabel("Contribution to FAIR")
     plt.xlabel("")
     plt.legend(loc="upper left")
@@ -373,7 +383,7 @@ def make_fair_gif(domain: pd.DataFrame, out_path: Path, fps: int = 12, tail_quar
         plt.scatter(d["date"].iloc[i - 1], d[fair_col].iloc[i - 1], color="black", s=25)
 
         plt.ylim(ymin, ymax)
-        plt.title("Home@ix FAIR — evolving signal (EW)")
+        plt.title("Home@ix FAIR â€” evolving signal (EW)")
         plt.ylabel("FAIR")
         plt.xlabel("")
 

@@ -1,7 +1,17 @@
-import sys
+﻿import sys
 import numpy as np
 import pandas as pd
 from pathlib import Path
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
+BUILD_DIR = PROJECT_ROOT / "build"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
 
 
 # ============================================================
@@ -270,7 +280,7 @@ def extract_monthly_from_homeatix(df_raw: pd.DataFrame) -> pd.DataFrame:
         s = (
             s.str.replace("\u00A0", "", regex=False)  # non-breaking space
              .str.replace(",", "", regex=False)       # thousands separators
-             .str.replace("£", "", regex=False)
+             .str.replace("Â£", "", regex=False)
              .str.strip()
         )
         # Treat obvious NA-ish strings as missing
