@@ -43,3 +43,8 @@ backup_inbox_py_*/
 backup_savefig_patch_*/
 
 sweep_up/inbox/index.html
+# Publication print artefacts (generated)
+publication/print_*/
+
+# Watermark backups (generated)
+publication/**/_backup_before_stamp_*/
