@@ -33,3 +33,12 @@ build/audit/**
 
 # but track the protocol file
 !build/audit/HOMEIX AUDIT PROTOCOL v1.txt
+# Build / generated artefacts
+_epub_extract/
+build/processed/
+figures/
+
+# Local safety backups
+backup_inbox_py_*/
+backup_savefig_patch_*/
+
