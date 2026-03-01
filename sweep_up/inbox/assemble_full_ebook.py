@@ -1,14 +1,3 @@
-﻿
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
-BUILD_DIR = PROJECT_ROOT / "build"
-OUTPUTS_DIR = PROJECT_ROOT / "outputs"
-PUBLICATION_DIR = PROJECT_ROOT / "publication"
-
-# assemble_full_ebook.py
 from __future__ import annotations
 
 import argparse
@@ -29,24 +18,18 @@ INBOX_DIR = Path(__file__).resolve().parent
 
 def find_project_root(start: Path) -> Path:
     """
-    Walk upwards from `start` until we find a directory that looks like the repo root.
+    Find repo root when this script lives in <root>/sweep_up/inbox.
 
-    Heuristics (any is enough):
-    - contains sweep_up/ and publication/
-    - contains homeix_followup_paper.html or homeix_fair_paper.html
-    - contains inputs/ and outputs/
+    Strategy:
+    - Walk up ancestors until we find a folder that contains:
+        sweep_up/inbox/   AND   inputs/   AND   outputs/
+    This avoids accidentally treating sweep_up/inbox as the project root.
     """
     for p in [start, *start.parents]:
-        if (p / "sweep_up").is_dir() and (p / "publication").is_dir():
-            return p
-        if (p / "homeix_followup_paper.html").exists() or (p / "homeix_fair_paper.html").exists():
-            return p
-        if (p / "inputs").is_dir() and (p / "outputs").is_dir():
+        if (p / "sweep_up" / "inbox").is_dir() and (p / "inputs").is_dir() and (p / "outputs").is_dir():
             return p
 
-    # Fallback: assume <project_root>/sweep_up/inbox -> parents[1] is project root
-    # inbox -> sweep_up -> project_root
-    return start.parents[1]
+    raise RuntimeError(f"Could not find project root above: {start}")
 
 
 PROJECT_ROOT = find_project_root(INBOX_DIR).resolve()
@@ -98,6 +81,16 @@ def strip_mathjax_scripts(html: str) -> str:
     return html
 
 
+def normalize_root_absolute_outputs(html: str) -> str:
+    """
+    Some source HTML may use root-absolute /outputs/... which breaks in a file bundle.
+    Convert to relative outputs/... so our copied bundle outputs/ folder is used.
+    """
+    html = re.sub(r'src="/outputs/', 'src="outputs/', html, flags=re.I)
+    html = re.sub(r"src='/outputs/", "src='outputs/", html, flags=re.I)
+    return html
+
+
 def copy_if_exists(src: Path, dst: Path) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     if not src.exists():
@@ -105,6 +98,18 @@ def copy_if_exists(src: Path, dst: Path) -> None:
         return
     shutil.copy2(src, dst)
     print(f"[OK] Copied: {src.name} -> {dst}")
+
+
+def copy_tree_if_exists(src_dir: Path, dst_dir: Path) -> None:
+    """
+    Copy an entire directory tree into the bundle.
+    Keeps the same structure so src="outputs/..." continues to work.
+    """
+    if not src_dir.exists():
+        print(f"[WARN] Missing directory (not copied): {src_dir}")
+        return
+    shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)
+    print(f"[OK] Copied directory: {src_dir} -> {dst_dir}")
 
 
 def pick_first_existing(candidates: list[Path], label: str) -> Path:
@@ -172,7 +177,7 @@ def part1_html() -> str:
     """
     return """
 <section id="part1">
-  <h2>Part I â€” The 2024 Foundations: Market Function Before Price</h2>
+  <h2>Part I — The 2024 Foundations: Market Function Before Price</h2>
 
   <p>
     Home@ix began from an observation that sounds simple but changes the whole measurement problem:
@@ -204,15 +209,15 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig1">
-      <h3>Figure 1 â€” Turnover and cash share (annual)</h3>
+      <h3>Figure 1 — Turnover and cash share (annual)</h3>
       <p>
-        Turnover is the housing marketâ€™s <strong>functionality / liquidity</strong> indicator: how many homes change hands relative to the stock.
+        Turnover is the housing market’s <strong>functionality / liquidity</strong> indicator: how many homes change hands relative to the stock.
         Cash share is a <strong>participation / exclusion</strong> indicator: when cash share rises alongside weak turnover, it is consistent with
         mortgage-dependent households being rationed out by rates, underwriting, or deposit constraints.
       </p>
       <figure>
         <img src="figures/exhibit_1_turnover_cashshare_annual.png"
-             alt="Exhibit 1 â€” Stock turnover (%) and cash share (annual)" loading="lazy" />
+             alt="Exhibit 1 — Stock turnover (%) and cash share (annual)" loading="lazy" />
         <figcaption><strong>Figure 1.</strong> Stock turnover and cash share (annual).</figcaption>
       </figure>
     </section>
@@ -220,15 +225,15 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig2a">
-      <h3>Figure 2a â€” Transaction levels: old stock vs new build (annual)</h3>
+      <h3>Figure 2a — Transaction levels: old stock vs new build (annual)</h3>
       <p>
-        â€œHousing activityâ€ is not one market. Old stock dominates volume and is more <strong>credit- and chain-sensitive</strong>.
+        “Housing activity” is not one market. Old stock dominates volume and is more <strong>credit- and chain-sensitive</strong>.
         New build volumes reflect additional constraints (planning, labour, build finance, developer pacing). The split helps distinguish
         <em>access/finance stress</em> from <em>delivery/capacity stress</em>.
       </p>
       <figure>
         <img src="figures/exhibit_2a_transaction_levels_annual.png"
-             alt="Exhibit 2a â€” Transaction levels: old stock vs new build (annual)" loading="lazy" />
+             alt="Exhibit 2a — Transaction levels: old stock vs new build (annual)" loading="lazy" />
         <figcaption><strong>Figure 2a.</strong> Transaction levels: old stock vs new build (annual).</figcaption>
       </figure>
     </section>
@@ -236,14 +241,14 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig2b">
-      <h3>Figure 2b â€” Transaction mix shares (annual)</h3>
+      <h3>Figure 2b — Transaction mix shares (annual)</h3>
       <p>
         Mix shares reveal <strong>compositional clearing</strong>: who is still able to transact when the market thins.
         Shifts in shares can signal allocation stress even when headline prices appear stable.
       </p>
       <figure>
         <img src="figures/exhibit_2b_transaction_mix_shares_annual.png"
-             alt="Exhibit 2b â€” Transaction mix shares (annual)" loading="lazy" />
+             alt="Exhibit 2b — Transaction mix shares (annual)" loading="lazy" />
         <figcaption><strong>Figure 2b.</strong> Transaction mix shares (annual).</figcaption>
       </figure>
     </section>
@@ -251,14 +256,14 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-fig4">
-      <h3>Figure 4 â€” Indexed price vs indexed turnover (annual)</h3>
+      <h3>Figure 4 — Indexed price vs indexed turnover (annual)</h3>
       <p>
         When turnover collapses, price indices can lag or understate stress because fewer transactions generate weaker price discovery.
         Liquidity risk becomes macro-relevant.
       </p>
       <figure>
         <img src="figures/exhibit_4_price_vs_turnover_index_annual.png"
-             alt="Exhibit 4 â€” House price vs turnover (indexed, annual)" loading="lazy" />
+             alt="Exhibit 4 — House price vs turnover (indexed, annual)" loading="lazy" />
         <figcaption><strong>Figure 4.</strong> Indexed price vs indexed turnover (annual).</figcaption>
       </figure>
     </section>
@@ -266,7 +271,7 @@ def part1_html() -> str:
     <hr />
 
     <section id="part1-cashshare-ew">
-      <h3>Supplement â€” Cash purchases share (England vs Wales, quarterly)</h3>
+      <h3>Supplement — Cash purchases share (England vs Wales, quarterly)</h3>
       <p>
         A cross-nation comparison helps separate broad regime shifts from local noise.
         Divergences can reflect geography-specific credit conditions, investor mix, or compositional effects.
@@ -286,7 +291,7 @@ def part1_html() -> str:
     <h3>2. Why this forces an accounting identity (and later, FAIR)</h3>
     <p>
       If the system clears through <strong>quantities and composition</strong> under stress, then an affordability framework must track access-to-finance
-      and market depth/throughput â€” not just price levels.
+      and market depth/throughput — not just price levels.
     </p>
     <div class="box">
       <strong>Bridge statement:</strong> Part I defines the failure mode (thin-market clearing). FAIR later converts that diagnosis into a reproducible quarterly monitor.
@@ -366,9 +371,14 @@ def main() -> None:
     # 2) Copy any additional figures
     bundle_extra_figures(figures_dir)
 
+    # 2b) Copy paper/FAIR assets referenced as outputs/... into the bundle
+    copy_tree_if_exists(OUTPUTS_DIR / "figures", outdir / "outputs" / "figures")
+    copy_tree_if_exists(OUTPUTS_DIR / "fair_assets", outdir / "outputs" / "fair_assets")
+    copy_tree_if_exists(OUTPUTS_DIR / "draft_paper_assets", outdir / "outputs" / "draft_paper_assets")
+
     # 3) Assemble HTML
-    follow_html = strip_mathjax_scripts(strip_base_tag(_read(follow)))
-    fair_html = strip_mathjax_scripts(strip_base_tag(_read(fair)))
+    follow_html = normalize_root_absolute_outputs(strip_mathjax_scripts(strip_base_tag(_read(follow))))
+    fair_html = normalize_root_absolute_outputs(strip_mathjax_scripts(strip_base_tag(_read(fair))))
 
     follow_body = extract_mainish(follow_html)
     fair_body = extract_mainish(fair_html)
@@ -390,7 +400,7 @@ def main() -> None:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Home@ix â€” Full Working Book (print bundle)</title>
+  <title>Home@ix — Full Working Book (print bundle)</title>
 
   <!-- MathJax (standardised to $$..$$) -->
   <script>
@@ -421,7 +431,7 @@ def main() -> None:
 <body>
   <main>
     <header>
-      <h1>Home@ix â€” Full Working Book (Draft)</h1>
+      <h1>Home@ix — Full Working Book (Draft)</h1>
       <p class="meta"><strong>Print bundle:</strong> {outdir.name} &nbsp;|&nbsp; <strong>Built:</strong> {human_stamp}</p>
     </header>
 
