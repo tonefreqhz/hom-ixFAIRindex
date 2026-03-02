@@ -35,42 +35,6 @@ def markdown_to_html(md: str) -> str:
 INBOX_DIR = Path(__file__).resolve().parent
 
 
-def find_project_root(start: Path) -> Path:
-    """
-    Walk upwards from `start` until we find a directory that looks like the repo root.
-
-    Heuristics (any is enough):
-    - contains sweep_up/ and publication/
-    - contains homeix_followup_paper.html or homeix_fair_paper.html
-    - contains inputs/ and outputs/
-    """
-    for p in (start, *start.parents):
-        if (p / "sweep_up").is_dir() and (p / "publication").is_dir():
-            return p
-        if (p / "homeix_followup_paper.html").exists() or (p / "homeix_fair_paper.html").exists():
-            return p
-        if (p / "inputs").is_dir() and (p / "outputs").is_dir():
-            return p
-
-    # Fallback: assume <project_root>/sweep_up/inbox -> parents[1] is project root
-    return start.parents[1]
-
-
-PROJECT_ROOT = find_project_root(INBOX_DIR).resolve()
-
-INPUTS_CANONICAL_DIR = PROJECT_ROOT / "inputs" / "canonical"
-BUILD_DIR = PROJECT_ROOT / "build"
-OUTPUTS_DIR = PROJECT_ROOT / "outputs"
-PUBLICATION_DIR = PROJECT_ROOT / "publication"
-
-# Ensure project root is on sys.path so imports work from any CWD
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-# ---------------------------------------------------------------------
-INBOX_DIR = Path(__file__).resolve().parent
-
-
 def _try_git_root(start: Path) -> Path | None:
     """Prefer git root if available (most robust)."""
     try:
@@ -121,6 +85,18 @@ PUBLICATION_DIR = PROJECT_ROOT / "publication"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 BUILD_PROCESSED_DIR = PROJECT_ROOT / "build" / "processed"
 INPUTS_CANONICAL_DIR = PROJECT_ROOT / "inputs" / "canonical"
+
+
+def render_section_slug(slug: str) -> str:
+    """
+    Read sections/<slug>/section.md and wrap it as a <section> block.
+    """
+    md_path = PROJECT_ROOT / "sections" / slug / "section.md"
+    if not md_path.exists():
+        raise FileNotFoundError(f"Missing section.md for slug '{slug}': {md_path}")
+
+    md = md_path.read_text(encoding="utf-8")
+    return f'<section id="{slug}">\n{markdown_to_html(md)}\n</section>\n'
 
 
 # ---------------------------------------------------------------------
@@ -210,15 +186,15 @@ def normalize_outputs_to_assets(html: str) -> str:
 
     # heal a known filename mismatch (legacy "crash" vs canonical "crisis")
     html = re.sub(
-        r'fig_price_and_fair_with_crash_starts\.png',
-        'fig_price_and_fair_with_crisis_starts.png',
+        r"fig_price_and_fair_with_crash_starts\.png",
+        "fig_price_and_fair_with_crisis_starts.png",
         html,
         flags=re.I,
     )
 
     # optional: rewrite outputs/... shown inside <code>...</code> blocks only
     def _rewrite_outputs_in_code(m):
-        inner = re.sub(r'\boutputs/', 'assets/', m.group(1), flags=re.I)
+        inner = re.sub(r"\boutputs/", "assets/", m.group(1), flags=re.I)
         return f"<code>{inner}</code>"
 
     html = re.sub(
@@ -229,7 +205,6 @@ def normalize_outputs_to_assets(html: str) -> str:
     )
 
     return html
-
 
 
 def copy_if_exists(src: Path, dst: Path) -> bool:
@@ -247,8 +222,6 @@ def pick_first_existing(candidates: list[Path], label: str) -> Path:
             return p
     msg = "\n  - " + "\n  - ".join(str(p) for p in candidates)
     raise FileNotFoundError(f"Missing {label}. Looked in:{msg}")
-    
-
 
 
 # ---------------------------------------------------------------------
@@ -771,6 +744,7 @@ def parse_args() -> argparse.Namespace:
     )
     return p.parse_args()
 
+
 def fair_maths_explained_html() -> str:
     md = r"""
 # Home@ix FAIR — The Maths Explained
@@ -921,16 +895,10 @@ A **crash start** is defined algorithmically as:
 
     return markdown_to_html(md)
 
-    # Use whatever Markdown->HTML helper your file already uses.
-    # Common patterns in your script are usually something like `md_to_html(md)` or similar.
-    return markdown_to_html(md)
 
 def main() -> None:
     args = parse_args()
     cwd = Path.cwd().resolve()
-    ...
-
-
 
     if args.outdir.strip():
         outdir = Path(args.outdir).expanduser().resolve()
@@ -1011,9 +979,13 @@ def main() -> None:
 </section>
 """.strip()
 
+    # ✅ Renamed from "my-new-section-title" to a stable, publication-ready slug:
+    pre_part1 = render_section_slug("opening-chapters")
+
     out = f"""<!doctype html>
 <html lang="en">
 <head>
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Home@ix — Full Working Book (print bundle)</title>
@@ -1057,6 +1029,8 @@ def main() -> None:
 
     <hr />
 
+    {pre_part1}
+
     {part1_html()}
 
     <hr />
@@ -1068,7 +1042,7 @@ def main() -> None:
 
     <hr />
 
-       {fair_preface_html()}
+    {fair_preface_html()}
 
     <hr />
 
@@ -1077,7 +1051,6 @@ def main() -> None:
     <hr />
 
     <section id="fair">
-
       <h2>FAIR Paper</h2>
       {fair_body}
     </section>
