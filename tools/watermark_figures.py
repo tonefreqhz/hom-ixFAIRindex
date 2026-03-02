@@ -88,7 +88,8 @@ def stamp_one(path: Path, logo_col: Path, logo_white: Path | None,
     if use_white_on_dark and logo_white is not None:
         # very lightweight darkness heuristic (sample a small region)
         sample = base.resize((64, 64)).convert("RGB")
-        pixels = sample.getdata()
+        pixels = list(sample.getdata())
+
         avg = sum((p[0] + p[1] + p[2]) for p in pixels) / (len(pixels) * 3)
         if avg < 90:  # dark background -> white logo reads better
             logo_path = logo_white

@@ -1,0 +1,13 @@
+{
+  "n_crash_starts":0.0,
+  "avg_leadQ_sigA":null,
+  "avg_leadQ_sigB":null,
+  "avg_leadQ_sigC":null,
+  "false_pos_rate_sigA":0.3055555556,
+  "false_pos_rate_sigB":0.1851851852,
+  "false_pos_rate_sigC":0.3148148148,
+  "dd_thresh":0.15,
+  "horizon_q":12.0,
+  "follow_window_q":8.0,
+  "cooldown_q":8.0
+}

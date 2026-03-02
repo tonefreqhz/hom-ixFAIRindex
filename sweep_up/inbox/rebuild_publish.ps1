@@ -5,12 +5,24 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# ---------- 0) Make console + Python UTF-8 (prevents Δ / UnicodeEncodeError) ----------
+# Note: chcp output is suppressed; this mainly helps older host configs.
+try { chcp 65001 | Out-Null } catch {}
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new() } catch {}
+
 Set-Location $ProjectRoot
 
-# Require Windows Python launcher
-if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
-  throw "Python launcher 'py' not found. Install Python from python.org (recommended) so 'py' is available."
+# --- Use venv Python (no global 'py' launcher required) ---
+$Python = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
+if (-not (Test-Path $Python)) {
+  throw "Venv python not found at: $Python"
 }
+
+# Silence Pillow DeprecationWarning noise (keeps real errors visible)
+$env:PYTHONWARNINGS = "ignore::DeprecationWarning"
+
 
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 
@@ -29,23 +41,22 @@ Remove-Item ".\outputs\*" -Recurse -Force -ErrorAction SilentlyContinue
 
 # ---------- 3) Rebuild in safe order ----------
 $steps = @(
-  "build_forward_indicator.py",
-  "choose_calm_baseline.py",
-  "compute_fair.py",
-  "plot_fair.py",
-  "build_fair_outputs.py",
-  "make_domain_terms.py",
-  "fix_domain_terms.py",
-  "backtest_ew_crash_warning.py"
+  "sweep_up\inbox\build_forward_indicator.py",
+  "sweep_up\inbox\choose_calm_baseline.py",
+  "sweep_up\inbox\compute_fair.py",
+  "sweep_up\inbox\plot_fair.py",
+  "sweep_up\inbox\build_fair_outputs.py",
+  "sweep_up\inbox\make_domain_terms.py",
+  "sweep_up\inbox\fix_domain_terms.py",
+  "sweep_up\inbox\backtest_ew_crash_warning.py"
 )
 
 foreach ($s in $steps) {
   if (!(Test-Path ".\$s")) { throw "Missing script: $s" }
 
   Write-Host "`nRunning: $s"
-  py ".\$s"
+  & $Python ".\$s"
 
-  # HARD STOP if the Python script errored (prevents cascading failures)
   if ($LASTEXITCODE -ne 0) {
     throw "Step failed (exit code $LASTEXITCODE): $s"
   }
@@ -87,24 +98,24 @@ if (Test-Path ".\homeix_fair_paper.html")     { Copy-Item ".\homeix_fair_paper.h
 if (Test-Path ".\homeix_followup_paper.html") { Copy-Item ".\homeix_followup_paper.html" $pub -Force }
 
 # ---------- 5) Assemble FULL combined ebook HTML into the print folder ----------
-# Requires assemble_full_ebook.py in the project root (writes index.html into current directory)
-if (Test-Path ".\assemble_full_ebook.py") {
+$ebookScriptCandidates = @(
+  ".\assemble_full_ebook.py",
+  ".\sweep_up\inbox\assemble_full_ebook.py"
+)
+
+$ebookScript = $ebookScriptCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if ($null -ne $ebookScript) {
   Write-Host "`nAssembling combined full ebook -> $pub\index.html"
-  Push-Location $pub
-  try {
-    py "$ProjectRoot\assemble_full_ebook.py"
-    if ($LASTEXITCODE -ne 0) {
-      throw "assemble_full_ebook.py failed (exit code $LASTEXITCODE)"
-    }
-  } finally {
-    Pop-Location
+  & $Python (Join-Path $ProjectRoot $ebookScript.TrimStart(".\")) --outdir $pub
+  if ($LASTEXITCODE -ne 0) {
+    throw "assemble_full_ebook.py failed (exit code $LASTEXITCODE)"
   }
 } else {
-  Write-Host "WARN: .\assemble_full_ebook.py not found (skipping combined ebook assembly)"
+  Write-Host "WARN: assemble_full_ebook.py not found (skipping combined ebook assembly)"
 }
 
 # ---------- 6) Copy full asset folders into the print bundle (recommended) ----------
-# This makes the print bundle self-contained and stable for review.
 $assetRoot = Join-Path $pub "assets"
 New-Item -ItemType Directory -Force -Path $assetRoot | Out-Null
 
@@ -122,6 +133,43 @@ foreach ($a in $assetFolders) {
     Write-Host "WARN: asset folder not found (skipping) $($a.src)"
   }
 }
+
+# ---------- 7) Watermark figures LAST (optional; runs only if tool exists) ----------
+$wmToolCandidates = @(
+  ".\tools\watermark_figures.py",
+  ".\sweep_up\inbox\watermark_figures.py"
+)
+
+$wmTool = $wmToolCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+$figDir = Join-Path $assetRoot "figures"
+
+# Hardcoded brand assets (these exist in your tree)
+$logoCol   = Join-Path $ProjectRoot "assets\branding\Final-logomark.png"
+$logoWhite = Join-Path $ProjectRoot "assets\brand\final_logo_white.png"
+
+if ($null -ne $wmTool -and (Test-Path $figDir)) {
+  if (-not (Test-Path $logoCol)) { throw "Missing logo_col PNG at: $logoCol" }
+  if (-not (Test-Path $logoWhite)) { throw "Missing logo_white PNG at: $logoWhite" }
+
+  Write-Host "`nWatermarking figures in: $figDir"
+  & $Python (Join-Path $ProjectRoot $wmTool.TrimStart(".\")) `
+    --root $figDir `
+    --logo_col $logoCol `
+    --logo_white $logoWhite `
+    --logo_corner tr `
+    --tm_corner br `
+    --use_white_on_dark
+
+  if ($LASTEXITCODE -ne 0) {
+    throw "watermark_figures.py failed (exit code $LASTEXITCODE)"
+  }
+} else {
+  if ($null -eq $wmTool) { Write-Host "WARN: watermark_figures.py not found (skipping watermark)" }
+  if (-not (Test-Path $figDir)) { Write-Host "WARN: figures folder not found at $figDir (skipping watermark)" }
+}
+
+
+
 
 Write-Host "`nDONE."
 Write-Host "Archived prior outputs: .\outputs_archive_$stamp"

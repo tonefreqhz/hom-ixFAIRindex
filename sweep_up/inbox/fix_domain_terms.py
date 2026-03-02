@@ -1,35 +1,66 @@
-﻿from pathlib import Path
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# ============================================================
+# PROJECT PATHS (no hard-coded inbox-relative outputs)
+# ============================================================
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../homeix
 
 INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
-BUILD_DIR = PROJECT_ROOT / "build"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
-PUBLICATION_DIR = PROJECT_ROOT / "publication"
+
+# ============================================================
+# HELPERS
+# ============================================================
+def resolve_existing_path(candidates: list[Path], label: str) -> Path:
+    """
+    Return first existing path from candidates; otherwise raise a helpful error.
+    """
+    for p in candidates:
+        if p.exists():
+            return p
+
+    msg = [f"{label} not found. Looked in:"]
+    msg.extend([f" - {str(p)}" for p in candidates])
+    raise FileNotFoundError("\n".join(msg))
 
 
-ROOT = Path(__file__).resolve().parent
+# ============================================================
+# INPUTS
+# ============================================================
+FQ_PATH = resolve_existing_path(
+    [
+        OUTPUTS_DIR / "features_quarterly_with_fair.csv",
+        # backwards-compat (older mistaken location)
+        PROJECT_ROOT / "sweep_up" / "inbox" / "outputs" / "features_quarterly_with_fair.csv",
+        PROJECT_ROOT / "sweep_up" / "inbox" / "features_quarterly_with_fair.csv",
+    ],
+    label="Quarterly features (features_quarterly_with_fair.csv)",
+)
 
-FQ_PATH = ROOT / "outputs" / "features_quarterly_with_fair.csv"
-if not FQ_PATH.exists():
-    alt = ROOT / "features_quarterly_with_fair.csv"
-    if alt.exists():
-        FQ_PATH = alt
-
-HOME_PATH = ROOT / "Homeatix housing market model(Sheet1) (4).csv"
+HOME_PATH = resolve_existing_path(
+    [
+        INPUTS_CANON / "homeatix_model.csv",
+        # backwards-compat (old filename if it still exists somewhere)
+        PROJECT_ROOT / "Homeatix housing market model(Sheet1) (4).csv",
+        PROJECT_ROOT / "sweep_up" / "inbox" / "Homeatix housing market model(Sheet1) (4).csv",
+    ],
+    label="Homeatix model CSV (homeatix_model.csv)",
+)
 
 print("Using FQ:", FQ_PATH)
 print("Using HOME:", HOME_PATH)
 
-# --- Load quarterly features ---
+# ============================================================
+# LOAD QUARTERLY FEATURES
+# ============================================================
 fq = pd.read_csv(FQ_PATH)
 
-# --- Load Homeatix (handle Windows/Excel encodings + messy rows) ---
-# Key improvement: interpret "nul" as NA so cleaning is reliable.
+# ============================================================
+# LOAD HOMEATIX (handle Windows/Excel encodings + messy rows)
+# ============================================================
+# Interpret "nul" as NA so cleaning is reliable.
 home = pd.read_csv(
     HOME_PATH,
     encoding="cp1252",
@@ -45,7 +76,9 @@ home.columns = (
     .str.strip()
 )
 
-# --- geo filter ---
+# ============================================================
+# GEO FILTER
+# ============================================================
 GEO = "ew"  # your file uses "EW"
 if "geo" not in fq.columns:
     raise KeyError(f"'geo' not found in FQ. Columns: {fq.columns.tolist()}")
@@ -59,7 +92,11 @@ fq["geo_norm"] = (
 fq = fq.loc[fq["geo_norm"].eq(GEO)].copy()
 print("Rows after geo filter:", len(fq))
 
-# --- mortgages: Â£m -> Â£bn ---
+# ============================================================
+# DOMAIN TERM TRANSFORMS
+# ============================================================
+
+# --- mortgages: £m -> £bn ---
 if "mb_total_gbp_m" not in fq.columns:
     raise KeyError(f"mb_total_gbp_m not found. Columns: {fq.columns.tolist()}")
 fq["mortgage_stock_gbp_bn"] = pd.to_numeric(fq["mb_total_gbp_m"], errors="coerce") / 1000.0
@@ -92,7 +129,9 @@ if "turnover_pct_q" not in fq.columns:
     raise KeyError("turnover_pct_q not found")
 fq["turnover_pct_q"] = pd.to_numeric(fq["turnover_pct_q"], errors="coerce")
 
-# --- prices: use Homeatix annual series ---
+# ============================================================
+# PRICES: USE HOMEATIX ANNUAL SERIES
+# ============================================================
 YEAR_COL = "Year"
 PRICE_COL = "avg_house_price_gbp_england_wales"
 
@@ -109,7 +148,7 @@ home2 = home2.dropna(subset=[YEAR_COL, PRICE_COL]).copy()
 home2 = home2.rename(columns={YEAR_COL: "year", PRICE_COL: "avg_house_price_gbp"})
 home2["year"] = home2["year"].astype(int)
 
-# --- Resolve duplicates deterministically (instead of raising) ---
+# Resolve duplicates deterministically (instead of raising)
 # Policy: keep the LAST occurrence for each year in file order.
 dup_years = home2.loc[home2.duplicated("year", keep=False), "year"].unique().tolist()
 if dup_years:
@@ -119,7 +158,7 @@ if dup_years:
     )
     home2 = home2.groupby("year", as_index=False).tail(1).sort_values("year").reset_index(drop=True)
 
-# --- Validate annual series integrity (catches mislabels fast) ---
+# Validate annual series integrity
 if home2.empty:
     raise ValueError(
         "Homeatix annual price series is empty after cleaning. "
@@ -128,39 +167,39 @@ if home2.empty:
 
 print("Homeatix annual year range:", int(home2["year"].min()), "to", int(home2["year"].max()))
 
-# build year in fq
+# Build year in fq
 if "period" not in fq.columns:
     raise KeyError(f"'period' not found in FQ. Columns: {fq.columns.tolist()}")
 
 fq["period"] = fq["period"].astype(str).str.replace("\u00A0", " ", regex=False).str.strip()
 fq["year"] = pd.to_numeric(fq["period"].str[:4], errors="coerce").astype("Int64")
 
-# avoid _x/_y suffixes by removing any existing price columns first
+# Avoid _x/_y suffixes by removing any existing price columns first
 price_cols_existing = [c for c in fq.columns if "avg_house_price" in c]
 if price_cols_existing:
     print("Dropping existing price cols in fq:", price_cols_existing)
     fq = fq.drop(columns=price_cols_existing)
 
-# --- merge annual price onto quarterly ---
+# Merge annual price onto quarterly
 fq = fq.merge(home2, on="year", how="left")
 
 if "avg_house_price_gbp" not in fq.columns:
     raise KeyError(f"'avg_house_price_gbp' missing after merge. Columns: {fq.columns.tolist()}")
 
-# ----------------------------
+# ============================================================
 # QUICK SANITY CHECKS
+# ============================================================
 last_home_year = int(home2["year"].max())
 missing_periods = fq.loc[fq["avg_house_price_gbp"].isna(), "period"].tolist()
 print("Last Home year:", last_home_year)
 print("Missing prices after merge (before any fill), first 30:", missing_periods[:30])
-# ----------------------------
 
-# provenance flag: ONLY mark rows we will carry forward (years > last_home_year and missing)
+# Provenance flag: ONLY mark rows we will carry forward (years > last_home_year and missing)
 fq["avg_house_price_gbp_is_ffill"] = (
     fq["avg_house_price_gbp"].isna() & (fq["year"] > last_home_year)
 ).astype(int)
 
-# --- fill missing prices ONLY for future years (e.g., 2025) ---
+# Fill missing prices ONLY for future years (e.g., 2025)
 fq = fq.sort_values(["year", "period"]).copy()
 
 last_year_prices = fq.loc[fq["year"] == last_home_year, "avg_house_price_gbp"].dropna()
@@ -174,7 +213,9 @@ last_known_price = float(last_year_prices.iloc[-1])
 mask_future = fq["year"] > last_home_year
 fq.loc[mask_future, "avg_house_price_gbp"] = fq.loc[mask_future, "avg_house_price_gbp"].fillna(last_known_price)
 
-# --- build table ---
+# ============================================================
+# BUILD TABLE
+# ============================================================
 STATE1, STATE2 = "2020Q3", "2025Q4"
 keep = [
     "period",
@@ -189,14 +230,17 @@ keep = [
 
 missing_keep = [c for c in keep if c not in fq.columns]
 if missing_keep:
-    raise KeyError(f"Missing required columns for output: {missing_keep}\nFQ columns: {fq.columns.tolist()}")
+    raise KeyError(
+        f"Missing required columns for output: {missing_keep}\n"
+        f"FQ columns: {fq.columns.tolist()}"
+    )
 
 out = fq.loc[fq["period"].isin([STATE1, STATE2]), keep].copy().sort_values("period")
 if len(out) != 2:
     raise ValueError(f"Expected 2 rows for {STATE1},{STATE2}; got {len(out)} rows.\n{out}")
 
 delta = out.iloc[1].copy()
-delta["period"] = "Î” (End - Start)"
+delta["period"] = "Δ (End - Start)"
 for c in keep[1:]:
     if c.endswith("_is_ffill"):
         delta[c] = ""
@@ -205,7 +249,7 @@ for c in keep[1:]:
 
 out = pd.concat([out, delta.to_frame().T], ignore_index=True)
 
-OUT_PATH = ROOT / "outputs" / "draft_paper_assets" / "domain_terms_state1_state2.csv"
+OUT_PATH = OUTPUTS_DIR / "draft_paper_assets" / "domain_terms_state1_state2.csv"
 OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 out.to_csv(OUT_PATH, index=False)
 
