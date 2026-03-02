@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from pathlib import Path
-
+# Project root = .../homeix (because this file is .../homeix/sweep_up/inbox/build_forward_indicator.py)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
@@ -12,19 +11,18 @@ BUILD_DIR = PROJECT_ROOT / "build"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 PUBLICATION_DIR = PROJECT_ROOT / "publication"
 
-
-
 # ============================================================
 # CONFIG
 # ============================================================
-ROOT = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix")
 
-INPUT_PATH = ROOT / r"Homeatix housing market model(Sheet1) (4).csv"
+# Canonical input (single source of truth)
+INPUT_PATH = INPUTS_CANON / "homeatix_model.csv"
 
-# use the stock file that exists in your folder listing
-STOCK_PATH = ROOT / "UK Housing Stock 2023 ons(UK Housing Stock) (1).csv"
+# Stock file: try canonical folder first, then project root (keeps backward compatibility)
+_STOCK_NAME = "UK Housing Stock 2023 ons(UK Housing Stock) (1).csv"
+STOCK_PATH = (INPUTS_CANON / _STOCK_NAME) if (INPUTS_CANON / _STOCK_NAME).exists() else (PROJECT_ROOT / _STOCK_NAME)
 
-OUT_DIR = ROOT / "outputs"
+OUT_DIR = OUTPUTS_DIR
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Forward horizons (quarters)
@@ -41,7 +39,6 @@ DEBUG = False
 
 # gate behaviour
 REQUIRE_COMPLETE_2024 = False  # True = strict (raise). False = warn + continue.
-
 
 # ============================================================
 # HELPERS

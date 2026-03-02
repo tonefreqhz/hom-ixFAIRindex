@@ -1,25 +1,32 @@
-﻿import numpy as np
+import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# ============================================================
+# PROJECT PATHS (no hard-coded C:\...)
+# ============================================================
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../homeix
 
 INPUTS_CANON = PROJECT_ROOT / "inputs" / "canonical"
 BUILD_DIR = PROJECT_ROOT / "build"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 PUBLICATION_DIR = PROJECT_ROOT / "publication"
 
+# ============================================================
+# PATHS
+# ============================================================
+# Quarterly features produced by build_forward_indicator.py
+IN_Q = OUTPUTS_DIR / "features_quarterly.csv"
 
-# ------------------ paths ------------------
-IN_Q = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly.csv")
-MB_M = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\Homeatix housing market model(Sheet1) (4).csv")
+# Canonical Homeatix model file (the one you renamed)
+MB_M = INPUTS_CANON / "homeatix_model.csv"
 
-OUT  = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\calm_baseline_candidates_wedge.csv")
-OUT_FEAT = Path(r"C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_wedge.csv")
+OUT = OUTPUTS_DIR / "calm_baseline_candidates_wedge.csv"
+OUT_FEAT = OUTPUTS_DIR / "features_quarterly_with_wedge.csv"
 
-# ------------------ knobs ------------------
+# ============================================================
+# KNOBS
+# ============================================================
 MIN_RUN_Q = 8          # minimum run length (quarters)
 ROLL_VOL_Q = 8         # rolling volatility window
 PCTL = 80              # calm threshold percentile on abs YoY moves (price, turnover)
@@ -33,7 +40,10 @@ MB_AGG = "mean"                             # "mean" (quarterly avg) or "eoq" (e
 PRINT_MB_COLS = True                        # print mortgage columns for debugging
 PRINT_MB_HEAD = 3                           # rows to print
 
-# ------------------ helpers ------------------
+
+# ============================================================
+# HELPERS
+# ============================================================
 def read_csv_robust(path: Path):
     """
     Robust CSV reader:
@@ -72,7 +82,44 @@ def read_csv_robust(path: Path):
     raise last_err
 
 
-# ------------------ load quarterly features ------------------
+def resolve_existing_path(candidates: list[Path], label: str) -> Path:
+    """
+    Pick the first existing path from candidates, otherwise raise a useful error.
+    """
+    for p in candidates:
+        if p.exists():
+            return p
+
+    msg = [f"{label} not found. Looked in:"]
+    msg.extend([f" - {str(p)}" for p in candidates])
+    raise FileNotFoundError("\n".join(msg))
+
+
+# ============================================================
+# RESOLVE INPUTS (robust)
+# ============================================================
+IN_Q = resolve_existing_path(
+    [
+        IN_Q,
+        PROJECT_ROOT / "outputs" / "features_quarterly.csv",
+    ],
+    label="Quarterly features file (features_quarterly.csv)",
+)
+
+MB_M = resolve_existing_path(
+    [
+        MB_M,
+        INPUTS_CANON / "homeatix_model.csv",
+        PROJECT_ROOT / "inputs" / "canonical" / "homeatix_model.csv",
+        # fallback: if someone left it in inbox
+        PROJECT_ROOT / "sweep_up" / "inbox" / "homeatix_model.csv",
+    ],
+    label="Canonical Homeatix model file (homeatix_model.csv)",
+)
+
+# ============================================================
+# LOAD QUARTERLY FEATURES
+# ============================================================
 df = pd.read_csv(IN_Q)
 
 # Period handling + sort
@@ -80,7 +127,7 @@ df["p"] = pd.PeriodIndex(df["period"], freq="Q")
 df = df.sort_values(["geo", "p"]).reset_index(drop=True)
 
 # YoY series
-df["gP_yoy"]  = df.groupby("geo")["avg_house_price_gbp"].pct_change(4)
+df["gP_yoy"] = df.groupby("geo")["avg_house_price_gbp"].pct_change(4)
 df["gTO_yoy"] = df.groupby("geo")["turnover_pct_q"].pct_change(4)
 
 # Volatility proxies (rolling std of YoY)
@@ -97,7 +144,9 @@ df["volTO_8q"] = (
       .reset_index(level=0, drop=True)
 )
 
-# ------------------ load mortgage monthly, aggregate to quarterly ------------------
+# ============================================================
+# LOAD MORTGAGE MONTHLY, AGGREGATE TO QUARTERLY
+# ============================================================
 mb, mb_meta = read_csv_robust(MB_M)
 
 print(f"[mortgage] read ok: encoding={mb_meta['encoding']} sep='{mb_meta['sep']}' rows={len(mb)} cols={mb.shape[1]}")
@@ -161,7 +210,9 @@ mb_q["geo"] = geo_only
 # Merge gMB_yoy into features
 df = df.merge(mb_q[["geo", "p", "gMB_yoy"]], on=["geo", "p"], how="left")
 
-# ------------------ wedge ------------------
+# ============================================================
+# WEDGE + CALM FLAG
+# ============================================================
 df["W"] = df["gP_yoy"] - df["gMB_yoy"]
 
 df["volW_8q"] = (
@@ -171,28 +222,30 @@ df["volW_8q"] = (
       .reset_index(level=0, drop=True)
 )
 
-# ------------------ thresholds on valid rows only ------------------
+# thresholds on valid rows only
 valid = df[["gP_yoy", "gTO_yoy", "volP_8q", "volTO_8q", "W"]].dropna()
 if len(valid) == 0:
     raise ValueError("No valid rows after computing YoY/volatility/wedge. Check date alignment and merge keys.")
 
-p80_abs_gP  = np.percentile(np.abs(valid["gP_yoy"]), PCTL)
+p80_abs_gP = np.percentile(np.abs(valid["gP_yoy"]), PCTL)
 p80_abs_gTO = np.percentile(np.abs(valid["gTO_yoy"]), PCTL)
-p80_abs_W   = np.percentile(np.abs(valid["W"]), WEDGE_PCTL)
+p80_abs_W = np.percentile(np.abs(valid["W"]), WEDGE_PCTL)
 
-med_volP  = np.median(valid["volP_8q"])
+med_volP = np.median(valid["volP_8q"])
 med_volTO = np.median(valid["volTO_8q"])
 
-# ------------------ calm flag ------------------
+# calm flag
 df["calm"] = (
-    (np.abs(df["gP_yoy"])  <= p80_abs_gP) &
+    (np.abs(df["gP_yoy"]) <= p80_abs_gP) &
     (np.abs(df["gTO_yoy"]) <= p80_abs_gTO) &
-    (df["volP_8q"]  <= med_volP) &
+    (df["volP_8q"] <= med_volP) &
     (df["volTO_8q"] <= med_volTO) &
     (np.abs(df["W"]) <= p80_abs_W)
 )
 
-# ------------------ identify consecutive calm runs per geo ------------------
+# ============================================================
+# IDENTIFY CONSECUTIVE CALM RUNS PER GEO
+# ============================================================
 runs = []
 for geo, g in df.groupby("geo", sort=False):
     g = g.sort_values("p").copy()
@@ -217,7 +270,9 @@ out = pd.DataFrame(runs)
 if len(out) > 0:
     out = out.sort_values(["geo", "n_quarters"], ascending=[True, False])
 
-# ------------------ write outputs ------------------
+# ============================================================
+# WRITE OUTPUTS
+# ============================================================
 OUT.parent.mkdir(parents=True, exist_ok=True)
 
 out.to_csv(OUT, index=False)
