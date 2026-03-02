@@ -6,7 +6,6 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 # ---------- 0) Make console + Python UTF-8 (prevents Δ / UnicodeEncodeError) ----------
-# Note: chcp output is suppressed; this mainly helps older host configs.
 try { chcp 65001 | Out-Null } catch {}
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
@@ -22,7 +21,6 @@ if (-not (Test-Path $Python)) {
 
 # Silence Pillow DeprecationWarning noise (keeps real errors visible)
 $env:PYTHONWARNINGS = "ignore::DeprecationWarning"
-
 
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 
@@ -134,42 +132,50 @@ foreach ($a in $assetFolders) {
   }
 }
 
-# ---------- 7) Watermark figures LAST (optional; runs only if tool exists) ----------
+# ---------- 7) Watermark figures LAST (recommended) ----------
 $wmToolCandidates = @(
   ".\tools\watermark_figures.py",
   ".\sweep_up\inbox\watermark_figures.py"
 )
 
 $wmTool = $wmToolCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-$figDir = Join-Path $assetRoot "figures"
 
 # Hardcoded brand assets (these exist in your tree)
 $logoCol   = Join-Path $ProjectRoot "assets\branding\Final-logomark.png"
 $logoWhite = Join-Path $ProjectRoot "assets\brand\final_logo_white.png"
 
-if ($null -ne $wmTool -and (Test-Path $figDir)) {
-  if (-not (Test-Path $logoCol)) { throw "Missing logo_col PNG at: $logoCol" }
+if ($null -ne $wmTool) {
+  if (-not (Test-Path $logoCol))   { throw "Missing logo_col PNG at: $logoCol" }
   if (-not (Test-Path $logoWhite)) { throw "Missing logo_white PNG at: $logoWhite" }
 
-  Write-Host "`nWatermarking figures in: $figDir"
-  & $Python (Join-Path $ProjectRoot $wmTool.TrimStart(".\")) `
-    --root $figDir `
-    --logo_col $logoCol `
-    --logo_white $logoWhite `
-    --logo_corner tr `
-    --tm_corner br `
-    --use_white_on_dark
+  $targets = @(
+    (Join-Path $assetRoot "figures"),
+    (Join-Path $assetRoot "fair_assets"),
+    (Join-Path $assetRoot "draft_paper_assets")
+  )
 
-  if ($LASTEXITCODE -ne 0) {
-    throw "watermark_figures.py failed (exit code $LASTEXITCODE)"
+  foreach ($t in $targets) {
+    if (Test-Path $t) {
+      Write-Host "`nWatermarking PNGs under: $t"
+      & $Python (Join-Path $ProjectRoot $wmTool.TrimStart(".\")) `
+        --root $t `
+        --logo_col $logoCol `
+        --logo_white $logoWhite `
+        --logo_corner tr `
+        --tm_corner br `
+        --use_white_on_dark `
+        --skip_if_marked
+
+      if ($LASTEXITCODE -ne 0) {
+        throw "watermark_figures.py failed (exit code $LASTEXITCODE) for target: $t"
+      }
+    } else {
+      Write-Host "WARN: watermark target folder not found (skipping) $t"
+    }
   }
 } else {
-  if ($null -eq $wmTool) { Write-Host "WARN: watermark_figures.py not found (skipping watermark)" }
-  if (-not (Test-Path $figDir)) { Write-Host "WARN: figures folder not found at $figDir (skipping watermark)" }
+  Write-Host "WARN: watermark_figures.py not found (skipping watermark)"
 }
-
-
-
 
 Write-Host "`nDONE."
 Write-Host "Archived prior outputs: .\outputs_archive_$stamp"
