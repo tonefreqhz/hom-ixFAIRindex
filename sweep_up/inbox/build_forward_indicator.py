@@ -18,9 +18,14 @@ PUBLICATION_DIR = PROJECT_ROOT / "publication"
 # Canonical input (single source of truth)
 INPUT_PATH = INPUTS_CANON / "homeatix_model.csv"
 
-# Stock file: try canonical folder first, then project root (keeps backward compatibility)
+# Stock file: try canonical folder first, then project root, then sweep_up/inbox (backward compat)
 _STOCK_NAME = "UK Housing Stock 2023 ons(UK Housing Stock) (1).csv"
-STOCK_PATH = (INPUTS_CANON / _STOCK_NAME) if (INPUTS_CANON / _STOCK_NAME).exists() else (PROJECT_ROOT / _STOCK_NAME)
+_STOCK_CANDIDATES = [
+    INPUTS_CANON / _STOCK_NAME,
+    PROJECT_ROOT / _STOCK_NAME,
+    PROJECT_ROOT / "sweep_up" / "inbox" / _STOCK_NAME,
+]
+STOCK_PATH = next((p for p in _STOCK_CANDIDATES if p.exists()), _STOCK_CANDIDATES[0])
 
 OUT_DIR = OUTPUTS_DIR
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -487,7 +492,12 @@ def main():
 
     if not STOCK_PATH.exists():
         print(f"ERROR: Stock file not found: {STOCK_PATH}")
+        print(f"Searched in:")
+        for p in _STOCK_CANDIDATES:
+            print(f"  {p}")
         sys.exit(1)
+
+    print(f"Stock file resolved to: {STOCK_PATH}")
 
     df_raw = read_homeatix_csv(INPUT_PATH)
 
