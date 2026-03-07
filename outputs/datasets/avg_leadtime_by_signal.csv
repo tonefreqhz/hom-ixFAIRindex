@@ -1,0 +1,4 @@
+signal,avg_lead_time_q,median_lead_time_q,n
+A: FAIR>20 (2Q),10.5,10.5,2
+B: dFAIR>5 (2Q),3.0,3.0,2
+C: FAIR>0 & dFAIR>=0,7.5,7.5,2

@@ -1,0 +1,27 @@
+{
+  "n_crisis_starts":2,
+  "avg_leadQ_sigA":10.5,
+  "avg_leadQ_sigB":3.0,
+  "avg_leadQ_sigC":7.5,
+  "false_pos_rate_sigA_eval_only":1.0,
+  "false_pos_rate_sigB_eval_only":0.75,
+  "false_pos_rate_sigC_eval_only":0.8888888889,
+  "follow_window_q":8,
+  "exclude_windows":[
+    [
+      "2007-07-01",
+      "2013-12-31"
+    ],
+    [
+      "2019-07-01",
+      "2025-12-31"
+    ]
+  ],
+  "manual_crisis_starts":[
+    "2007-09-30 00:00:00",
+    "2019-09-30 00:00:00"
+  ],
+  "dd_thresh_legacy":0.15,
+  "horizon_q_legacy":12,
+  "cooldown_q_legacy":8
+}
