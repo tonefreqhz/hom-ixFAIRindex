@@ -1,0 +1,2 @@
+=== Cover Fix Note ===
+Cover.tex created, FAIR re-compiled to homeix/outputs/. Math preserved.
