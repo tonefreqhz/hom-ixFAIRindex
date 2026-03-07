@@ -25,13 +25,13 @@ cursor_color = (0, 0, 0)  # Black cursor
 width, height = image.size
 
 # Add title (top center)
-title_text = "Reproducible Self‑Pub Kit"
+title_text = "hom-ixFAIRindex"
 bbox = draw.textbbox((0, 0), title_text, font=title_font)
 text_width = bbox[2] - bbox[0]
 draw.text(((width - text_width) / 2, 100), title_text, fill=text_color, font=title_font)
 
 # Add subtitle (below title)
-subtitle_text = "Shipping Without Surprises"
+subtitle_text = "hom-ixFAIRindex"
 bbox = draw.textbbox((0, 0), subtitle_text, font=subtitle_font)
 text_width = bbox[2] - bbox[0]
 draw.text(((width - text_width) / 2, 180), subtitle_text, fill=text_color, font=subtitle_font)
@@ -100,3 +100,4 @@ draw.text((text_x, text_y), full_text, fill=screen_text_color, font=seal_font)
 # Save the final cover
 image.save(FINAL_COVER)
 print(f"Cover with transparent seal background (vector-style), adjusted position, and all features added: {FINAL_COVER}")
+

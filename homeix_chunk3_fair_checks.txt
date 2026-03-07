@@ -1,0 +1,49 @@
+=== FAIR Chapters Check ===
+
+FullName                                                                    Length
+--------                                                                    ------
+C:\Users\peewe\OneDrive\Desktop\homeix\publication\PRINT_AND_BUILD_NOTES.md  16371
+
+=== FAIR Outputs Check ===
+
+FullName                                                                                                     Length
+--------                                                                                                     ------
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\calm_baseline_candidates_wedge.csv                               187
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\fair_summary_baseline_stats.csv                                  280
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_monthly_extracted.csv                                 46943
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_fair.csv                               52360
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly_with_wedge.csv                              33871
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\features_quarterly.csv                                         19131
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\model_matrix_quarterly.csv                                     93362
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\datasets\avg_leadtime_by_signal.csv                              133
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\datasets\leadtime_by_signal_events.csv                           128
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\domain_terms_state1_state2.csv                331
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\ew_crisis_starts.csv                           38
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\ew_events_lead_times.csv                      128
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\ew_summary.json                               540
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\fig_avg_leadtime_by_signal.png              64975
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\fig_price_and_fair_with_crisis_starts.png  163616
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\draft_paper_assets\README_METHOD_NOTE.txt                       3015
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\fair_assets\anim_fair_direction_of_flow.gif                  1820418
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\fair_assets\fair_quarterly_audit.csv                           35221
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\fair_assets\fig_fair_contributions.png                        210798
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\fair_assets\fig_fair_level.png                                158877
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\figures\anim_fair_flow.gif                                   1815331
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\figures\fig_domain_mortgage_stock_gbp_bn.png                   63765
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\figures\fig_domain_turnover_pct_q.png                         111058
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\figures\fig_fair_contrib.png                                  226641
+C:\Users\peewe\OneDrive\Desktop\homeix\outputs\figures\fig_fair_level.png                                    169148
+
+=== FAIR Assets/Media Check ===
+
+FullName                                                                                   Length
+--------                                                                                   ------
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\brand\final_logo_white.png                    81642
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\brand\width_531.png                           62090
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\branding\Final-Logo-white.png                 81642
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\branding\Final-logomark.png                   40947
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\fair_assets\anim_fair_direction_of_flow.gif 1880532
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\fair_assets\anim_fair_flow.gif              1880532
+C:\Users\peewe\OneDrive\Desktop\homeix\assets\media\ons_fig3_three_panel_LQ_1997_2024.mp4  610299
+
+Note: FAIR math unmolested—check for LaTeX in .md files if needed.

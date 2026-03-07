@@ -1,0 +1,12 @@
+=== Recent Homeix Git Commits ===
+58873fa Bake cover with 'hom-ixFAIRindex', add LICENSE and assets.
+511a8cc Update build scripts and notes for path harmonization and reproducibility: anchor paths to repo root, fix drift issues.
+95f546e Conform PRINT_AND_BUILD_NOTES.md to kit standards: anchored paths, anti-drift structure, reproducible commands.
+8c08487 Ignore local tooling script
+ffab450 Add section scaffolding tool
+6a71872 Add sections and switch pre-part slug to opening-chapters
+e5e2188 Watermark all print-bundle asset folders; avoid double-stamping
+258341d Housekeeping: ebook build + watermark fixes; update print notes
+b8f521c Document/clean print pipeline run; suppress Pillow DeprecationWarning
+81684ce Ignore generated outputs
+Homeix diagnostic complete—chunks saved. Upload each to a larger service.
