@@ -1,4 +1,0 @@
-=== FAIR Source Check ===
-=== FAIR Compilation Tools Check ===
-pandoc 3.9
-Git status: 7 changes.
