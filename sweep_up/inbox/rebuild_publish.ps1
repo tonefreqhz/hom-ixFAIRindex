@@ -1,3 +1,15 @@
+# === W-ANCHOR ENCODING GATE ===
+# Must be first. Prevents UTF-8 mojibake through mjpage pipe.
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding  = [System.Text.Encoding]::UTF8
+$OutputEncoding           = [System.Text.Encoding]::UTF8
+chcp 65001 | Out-Null   # Set Windows console code page to UTF-8
+
+# Then your existing render step:
+Get-Content "publication\print_latest\index.html" -Encoding UTF8 -Raw | `
+  mjpage --output SVG --format TeX --ex 8 | `
+  Set-Content "publication\print_latest\index_rendered.html" -Encoding UTF8
+
 param(
   [string]$ProjectRoot = "C:\Users\peewe\OneDrive\Desktop\homeix"
 )
