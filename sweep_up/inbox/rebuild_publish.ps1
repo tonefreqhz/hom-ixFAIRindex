@@ -65,17 +65,18 @@ $pub = ".\publication\print_$stamp"
 New-Item -ItemType Directory -Force -Path $pub | Out-Null
 
 # Curate what goes into the print bundle (adjust freely)
+# NOTE: backtest script writes ew_crisis_starts / fig_price_and_fair_with_crisis_starts
 $include = @(
   ".\outputs\fair_summary_baseline_stats.csv",
   ".\outputs\fair_assets\fair_quarterly_audit.csv",
   ".\outputs\fair_assets\fig_fair_contributions.png",
   ".\outputs\fair_assets\fig_fair_level.png",
   ".\outputs\fair_assets\anim_fair_direction_of_flow.gif",
-  ".\outputs\draft_paper_assets\ew_crash_starts.csv",
+  ".\outputs\draft_paper_assets\ew_crisis_starts.csv",
   ".\outputs\draft_paper_assets\ew_events_lead_times.csv",
   ".\outputs\draft_paper_assets\ew_summary.json",
   ".\outputs\draft_paper_assets\fig_avg_leadtime_by_signal.png",
-  ".\outputs\draft_paper_assets\fig_price_and_fair_with_crash_starts.png",
+  ".\outputs\draft_paper_assets\fig_price_and_fair_with_crisis_starts.png",
   ".\outputs\draft_paper_assets\domain_terms_state1_state2.csv",
   ".\outputs\figures\fig_domain_turnover_pct_q.png",
   ".\outputs\figures\fig_domain_mortgage_stock_gbp_bn.png",
@@ -120,7 +121,7 @@ New-Item -ItemType Directory -Force -Path $assetRoot | Out-Null
 $assetFolders = @(
   @{ src = ".\outputs\fair_assets";        dst = (Join-Path $assetRoot "fair_assets") },
   @{ src = ".\outputs\draft_paper_assets"; dst = (Join-Path $assetRoot "draft_paper_assets") },
-  @{ src = ".\outputs\figures";           dst = (Join-Path $assetRoot "figures") }
+  @{ src = ".\outputs\figures";            dst = (Join-Path $assetRoot "figures") }
 )
 
 foreach ($a in $assetFolders) {
@@ -177,10 +178,115 @@ if ($null -ne $wmTool) {
   Write-Host "WARN: watermark_figures.py not found (skipping watermark)"
 }
 
+# ---------- 8) THREE-FORMAT EXPORT — DOCX + EPUB + PDF ----------
+# Source : publication\print_<stamp>\index.html  (written by step 5)
+# Cover  : assets\cover\front_cover.jpg          (519 KB — canonical)
+# Images : --resource-path set to pubAbs so pandoc resolves relative asset refs
+# PDF    : wkhtmltopdf (weasyprint requires GTK — not available on this machine)
+
+$pubAbs   = (Resolve-Path $pub).Path
+$srcHtml  = Join-Path $pubAbs "index.html"
+$coverImg = Join-Path $ProjectRoot "assets\cover\front_cover.jpg"
+$slug     = "homeix_draft2_digital"
+$title    = "HOME@IX FAIR-INDEX"
+$author   = "tonefreqhz"
+$date     = Get-Date -Format "yyyy-MM-dd"
+
+Write-Host ""
+Write-Host "------------------------------------------------------------"
+Write-Host "  STEP 8 — THREE-FORMAT EXPORT" -ForegroundColor Cyan
+Write-Host "------------------------------------------------------------"
+
+if (-not (Test-Path $srcHtml)) {
+  Write-Host "WARN: index.html not found at $srcHtml — skipping three-format export" -ForegroundColor Yellow
+} else {
+
+  # ── DOCX ───────────────────────────────────────────────────
+  Write-Host "  [BUILD] DOCX..." -ForegroundColor Yellow
+  pandoc $srcHtml `
+    --from html `
+    --to docx `
+    --output "$pubAbs\$slug.docx" `
+    --resource-path $pubAbs `
+    --standalone
+  if (Test-Path "$pubAbs\$slug.docx") {
+    Write-Host "  [OK   ] $slug.docx" -ForegroundColor Green
+  } else {
+    Write-Host "  [FAIL ] DOCX not written — check pandoc output above" -ForegroundColor Red
+  }
+
+  # ── EPUB ───────────────────────────────────────────────────
+  Write-Host "  [BUILD] EPUB..." -ForegroundColor Yellow
+  pandoc $srcHtml `
+    --from html `
+    --to epub3 `
+    --output "$pubAbs\$slug.epub" `
+    --resource-path $pubAbs `
+    --epub-cover-image $coverImg `
+    --metadata title="$title" `
+    --metadata author="$author" `
+    --metadata date="$date" `
+    --standalone
+  if (Test-Path "$pubAbs\$slug.epub") {
+    Write-Host "  [OK   ] $slug.epub" -ForegroundColor Green
+  } else {
+    Write-Host "  [FAIL ] EPUB not written — check pandoc output above" -ForegroundColor Red
+  }
+
+  # ── PDF via wkhtmltopdf ─────────────────────────────────────
+  # weasyprint requires libgobject-2.0-0 (GTK) which is not installed.
+  # wkhtmltopdf resolves local file:// assets natively on Windows.
+  Write-Host "  [BUILD] PDF (wkhtmltopdf)..." -ForegroundColor Yellow
+  $wk = "C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+  if (Test-Path $wk) {
+    & $wk `
+      --enable-local-file-access `
+      --page-size A4 `
+      --margin-top 20mm `
+      --margin-bottom 20mm `
+      --margin-left 18mm `
+      --margin-right 18mm `
+      --encoding utf-8 `
+      $srcHtml `
+      "$pubAbs\$slug.pdf"
+    if (Test-Path "$pubAbs\$slug.pdf") {
+      Write-Host "  [OK   ] $slug.pdf" -ForegroundColor Green
+    } else {
+      Write-Host "  [FAIL ] PDF not written — check wkhtmltopdf output above" -ForegroundColor Red
+    }
+  } else {
+    Write-Host "  [SKIP ] wkhtmltopdf not found at: $wk" -ForegroundColor Yellow
+    Write-Host "          Install with:  winget install --id wkhtmltopdf.wkhtmltopdf" -ForegroundColor Yellow
+  }
+
+  # ── MANIFEST ───────────────────────────────────────────────
+  Write-Host ""
+  Write-Host "  Publication bundle contents:" -ForegroundColor White
+  Get-ChildItem $pubAbs -File |
+    Where-Object { $_.Extension -in ".html",".docx",".epub",".pdf" } |
+    ForEach-Object {
+      $kb = [math]::Round($_.Length / 1KB, 1)
+      Write-Host ("    {0,-45} {1,8} KB" -f $_.Name, $kb)
+    }
+}
+
+Write-Host "------------------------------------------------------------"
+Write-Host ""
+
+# ---------- DONE ----------
 Write-Host "`nDONE."
 Write-Host "Archived prior outputs: .\outputs_archive_$stamp"
 Write-Host "Publication bundle:     $pub"
 Write-Host "Full bundle path:       $((Resolve-Path $pub).Path)"
 if (Test-Path (Join-Path $pub "index.html")) {
   Write-Host "Open combined ebook:    $((Resolve-Path (Join-Path $pub 'index.html')).Path)"
+}
+if (Test-Path "$pubAbs\$slug.docx") {
+  Write-Host "DOCX (Draft2Digital):   $pubAbs\$slug.docx"
+}
+if (Test-Path "$pubAbs\$slug.epub") {
+  Write-Host "EPUB (KDP/Lulu):        $pubAbs\$slug.epub"
+}
+if (Test-Path "$pubAbs\$slug.pdf") {
+  Write-Host "PDF  (print-ready):     $pubAbs\$slug.pdf"
 }

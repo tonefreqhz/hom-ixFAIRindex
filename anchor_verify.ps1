@@ -14,7 +14,13 @@ Write-Host " HOME@IX FAIR-INDEX W-ANCHOR VERIFY"
 Write-Host "============================================================"
 Write-Host ""
 
-$root = "C:\Users\peewe\OneDrive\Desktop\homeix"
+$RepoRoot = $PSScriptRoot
+Set-Location -LiteralPath $RepoRoot
+Write-Host "  [ANCHORED] $RepoRoot" -ForegroundColor Cyan
+
+
+$root = $RepoRoot
+
 $ok   = $true
 
 function Check-Path($label, $path) {
