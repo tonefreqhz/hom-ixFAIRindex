@@ -1,18 +1,13 @@
+param(
+  [string]$ProjectRoot = "C:\Users\peewe\OneDrive\Desktop\homeix"
+)
+
 # === W-ANCHOR ENCODING GATE ===
-# Must be first. Prevents UTF-8 mojibake through mjpage pipe.
+# Must be first executable block after param(). Prevents UTF-8 mojibake through mjpage pipe.
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 $OutputEncoding           = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null   # Set Windows console code page to UTF-8
-
-# Then your existing render step:
-Get-Content "publication\print_latest\index.html" -Encoding UTF8 -Raw | `
-  mjpage --output SVG --format TeX --ex 8 | `
-  Set-Content "publication\print_latest\index_rendered.html" -Encoding UTF8
-
-param(
-  [string]$ProjectRoot = "C:\Users\peewe\OneDrive\Desktop\homeix"
-)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -126,6 +121,39 @@ if ($null -ne $ebookScript) {
   Write-Host "WARN: assemble_full_ebook.py not found (skipping combined ebook assembly)"
 }
 
+# ---------- 5b) Pre-render TeX math -> SVG via mjpage ----------
+# Operates on the stamped bundle index.html written by Step 5.
+# If mjpage succeeds, $srcHtml is reassigned to index_rendered.html so
+# Step 8 (pandoc) picks up SVG math automatically — no other changes needed.
+# If mjpage is absent the pipeline falls back silently to raw index.html.
+
+$pubAbs      = (Resolve-Path $pub).Path
+$srcHtml     = Join-Path $pubAbs "index.html"
+$srcRendered = Join-Path $pubAbs "index_rendered.html"
+
+Write-Host ""
+Write-Host "------------------------------------------------------------"
+Write-Host "  STEP 5b — MATH PRE-RENDER (TeX -> SVG via mjpage)" -ForegroundColor Cyan
+Write-Host "------------------------------------------------------------"
+
+$mjpageCmd = Get-Command mjpage -ErrorAction SilentlyContinue
+if ($null -ne $mjpageCmd) {
+  Write-Host "  [BUILD] mjpage TeX -> SVG on stamped bundle..." -ForegroundColor Yellow
+  Get-Content $srcHtml -Encoding UTF8 -Raw |
+    mjpage --output SVG --format TeX --ex 8 |
+    Set-Content $srcRendered -Encoding UTF8
+
+  if (Test-Path $srcRendered) {
+    Write-Host "  [OK   ] index_rendered.html written" -ForegroundColor Green
+    $srcHtml = $srcRendered   # Step 8 now reads the SVG-rendered file
+  } else {
+    Write-Host "  [FAIL ] index_rendered.html not written — pandoc will use raw index.html" -ForegroundColor Red
+  }
+} else {
+  Write-Host "  [SKIP ] mjpage not found — math will render as raw TeX in epub" -ForegroundColor Yellow
+  Write-Host "          Install with: npm install -g mathjax-node-page" -ForegroundColor Yellow
+}
+
 # ---------- 6) Copy full asset folders into the print bundle (recommended) ----------
 $assetRoot = Join-Path $pub "assets"
 New-Item -ItemType Directory -Force -Path $assetRoot | Out-Null
@@ -191,13 +219,12 @@ if ($null -ne $wmTool) {
 }
 
 # ---------- 8) THREE-FORMAT EXPORT — DOCX + EPUB + PDF ----------
-# Source : publication\print_<stamp>\index.html  (written by step 5)
+# Source : $srcHtml — index_rendered.html if mjpage succeeded (Step 5b),
+#          otherwise index.html. Variable reassigned in Step 5b; no change needed here.
 # Cover  : assets\cover\front_cover.jpg          (519 KB — canonical)
 # Images : --resource-path set to pubAbs so pandoc resolves relative asset refs
 # PDF    : wkhtmltopdf (weasyprint requires GTK — not available on this machine)
 
-$pubAbs   = (Resolve-Path $pub).Path
-$srcHtml  = Join-Path $pubAbs "index.html"
 $coverImg = Join-Path $ProjectRoot "assets\cover\front_cover.jpg"
 $slug     = "homeix_draft2_digital"
 $title    = "HOME@IX FAIR-INDEX"
@@ -210,7 +237,7 @@ Write-Host "  STEP 8 — THREE-FORMAT EXPORT" -ForegroundColor Cyan
 Write-Host "------------------------------------------------------------"
 
 if (-not (Test-Path $srcHtml)) {
-  Write-Host "WARN: index.html not found at $srcHtml — skipping three-format export" -ForegroundColor Yellow
+  Write-Host "WARN: source HTML not found at $srcHtml — skipping three-format export" -ForegroundColor Yellow
 } else {
 
   # ── DOCX ───────────────────────────────────────────────────
@@ -289,9 +316,12 @@ Write-Host ""
 Write-Host "`nDONE."
 Write-Host "Archived prior outputs: .\outputs_archive_$stamp"
 Write-Host "Publication bundle:     $pub"
-Write-Host "Full bundle path:       $((Resolve-Path $pub).Path)"
+Write-Host "Full bundle path:       $pubAbs"
 if (Test-Path (Join-Path $pub "index.html")) {
   Write-Host "Open combined ebook:    $((Resolve-Path (Join-Path $pub 'index.html')).Path)"
+}
+if (Test-Path (Join-Path $pub "index_rendered.html")) {
+  Write-Host "Rendered math source:   $srcRendered"
 }
 if (Test-Path "$pubAbs\$slug.docx") {
   Write-Host "DOCX (Draft2Digital):   $pubAbs\$slug.docx"
